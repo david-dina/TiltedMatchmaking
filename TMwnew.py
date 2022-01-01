@@ -29,8 +29,7 @@ db = client.server
 connected = db.matches
 
 supported = ['RL','rl','Roblox','roblox','MC','mc','Mc','Val','val','Fortnite','fortnite']
-intents = discord.Intents.default()
-intents.members = True
+intents = discord.Intents.all()
 async def get_pre(bot, message):
     return ['tm!','TM!','Tm!','tM!']
 
