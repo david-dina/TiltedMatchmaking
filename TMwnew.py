@@ -153,22 +153,27 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='Please also just put your rank not tier.',inline=False)
                 embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
                 embed.set_footer(text='When saying your rank please do it as exactly as you see above.')
-                button = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
-                button = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
-                button = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
-                button = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
-                button = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
-                button = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
-                button = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
+                button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
+                button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
+                button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
+                button4 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
+                button5 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
+                button6 = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
+                button7 = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
                 view = View()
-                view.add_item(button)
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(button4)
+                view.add_item(button5)
+                view.add_item(button6)
+                view.add_item(button7)
                 await ctx.respond(embed=embed,view=view)
-                rank = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'gc', 'ssl','Bronze','Silver','Gold','Platinum','Diamond','Gc','Ssl']
 
                 def check(message):
                     return message.content in rank and (message.channel == ctx.channel) and (message.author == ctx.author)
                 try:
-                    answer = await bot.wait_for('message', timeout=30, check=check)
+                    answer = await bot.wait_for('button_click', timeout=30, check=check)
                 except asyncio.TimeoutError:
                     await ctx.respond('You didnt respond... Cancelling setup.')
                 else:
@@ -780,7 +785,7 @@ async def addgame(ctx,game:Option(str,"The game to setup with",required=True,cho
     if x == None:
         await ctx.respond('You dont have a profile to add games to. Please go set one up using `TM!setup`.')
     else:
-
+        await ctx.defer()
         if game == 'Rocket League':
             user = Profiles.rocket(ctx.author.id)
             if user != None:
