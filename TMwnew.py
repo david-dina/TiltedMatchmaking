@@ -2,6 +2,7 @@
 import discord
 from discord.ext import commands,tasks
 from discord.ext.commands import BucketType
+from discord.commands import Option
 import pymongo
 import asyncio
 import datetime
@@ -126,7 +127,7 @@ async def on_guild_remove(guild):
 
 
 @bot.slash_command(guild_ids=[877460893439512627])
-async def setup(ctx):
+async def setup(ctx,game:Option(str,"The game to setup with")):
     """Set up your personal profile using this command"""
     await ctx.defer()
     x = Profiles.profiles(ctx.author.id)
@@ -143,7 +144,7 @@ async def setup(ctx):
         await ctx.respond(embed = embed)
     else:
         if x != None:
-            await ctx.respond('Error: You have already set up a profile. To add games to your profile use the `TM!addgame` command')
+            await ctx.respond('Error: You have already set up a profile. To add games to your profile use the addgame command')
             return
         else:
             embed = discord.Embed(title=f'Profile Setup for {ctx.author.name}',color=0xCC071F)
@@ -157,7 +158,7 @@ async def setup(ctx):
             except asyncio.TimeoutError:
                 await ctx.respond('You didnt respond... Cancelling setup.')
             else:
-                if msg.content == 'RL' or msg.content == 'rl':
+                if game == 'RL' or game == 'rl':
                     embed = discord.Embed(title='What is your Rocket League rank?',description='The ranks are from lowest to highest:** bronze, silver, gold, platinum, diamond, gc, ssl**',color=0xCC071F)
                     embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='Please also just put your rank not tier.',inline=False)
                     embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
