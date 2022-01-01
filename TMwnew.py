@@ -30,10 +30,9 @@ connected = db.matches
 
 supported = ['RL','rl','Roblox','roblox','MC','mc','Mc','Val','val','Fortnite','fortnite']
 intents = discord.Intents.all()
-async def get_pre(bot, message):
-    return ['tm!','TM!','Tm!','tM!']
 
-bot = commands.Bot(command_prefix=get_pre,case_insensitive=True,intents=intents,status=discord.Status.dnd,activity=discord.Activity(name='Coming back to you soon!',type=discord.ActivityType.watching))
+
+bot = commands.Bot(intents=intents,status=discord.Status.dnd,activity=discord.Activity(name='Coming back to you soon!',type=discord.ActivityType.watching))
 bot.remove_command('help')
 UserProfiles = UserProfiles(bot)
 Profiles = Profiles()
@@ -131,13 +130,13 @@ async def setup(ctx):
     """Set up your personal profile using this command"""
     await ctx.defer()
     x = Profiles.profiles(ctx.author.id)
-    embed = discord.Embed(title=f'New Profile Setup by {ctx.author}',color=0xCC071F)
-    if (ctx.message.guild == None):
-        embed.add_field(name='Command ran in DMS',value='\u200b',inline=False)
-    else:
-        embed.add_field(name = f'Guild:',value=f'{ctx.guild}')
-    channel = bot.get_channel(826331977257844746)
-    await channel.send(embed = embed)
+    #embed = discord.Embed(title=f'New Profile Setup by {ctx.author}',color=0xCC071F)
+    #if (ctx.message.guild == None):
+        #embed.add_field(name='Command ran in DMS',value='\u200b',inline=False)
+    #else:
+        #embed.add_field(name = f'Guild:',value=f'{ctx.guild}')
+    #channel = bot.get_channel(826331977257844746)
+    #await channel.send(embed = embed)
     perp = Profiles.blacklisted(ctx.author.id)
     if perp != None:
         embed = discord.Embed(title=f'Error: You have been blacklisted from our services for: {perp.get("reason")} ',description='If You wish to appeal your sentence than please join our support server [here](https://discord.gg/5XAubY2v3N) and open a ticket.',color=0xCC071F)
