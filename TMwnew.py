@@ -1,3 +1,4 @@
+#Same as TM.py but integrated with py-cord and the new slash commands feature
 import discord
 from discord.ext import commands,tasks
 from discord.ext.commands import BucketType
