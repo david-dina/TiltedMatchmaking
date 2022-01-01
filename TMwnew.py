@@ -28,8 +28,7 @@ fort = db.fortnite
 client = pymongo.MongoClient('mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE')
 db = client.server
 connected = db.matches
-
-supported = ['RL','rl','Roblox','roblox','MC','mc','Mc','Val','val','Fortnite','fortnite']
+supported_games = ["Rocket League","Roblox","Minecraft","Valorant","Fortnite"]
 intents = discord.Intents.all()
 
 
@@ -125,11 +124,12 @@ async def on_guild_remove(guild):
 
 
 
-
+#Rocket League: RL \n Roblox \n Minecraft: MC\n Valorant: Val \n Fortnite'
 @bot.slash_command(guild_ids=[877460893439512627])
-async def setup(ctx,game:Option(str,"The game to setup with")):
+async def setup(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
     """Set up your personal profile using this command"""
     await ctx.defer()
+    await ctx.respond(game)
     x = Profiles.profiles(ctx.author.id)
     #embed = discord.Embed(title=f'New Profile Setup by {ctx.author}',color=0xCC071F)
     #if (ctx.message.guild == None):
