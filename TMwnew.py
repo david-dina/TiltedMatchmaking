@@ -122,14 +122,14 @@ async def on_guild_remove(guild):
     embed.timestamp = datetime.datetime.utcnow()
     ctx = bot.get_channel(822858833093066752)
     await ctx.send(embed = embed)
-
+#Remember to remove below
 supported = ['yes']
 
-#Rocket League: RL \n Roblox \n Minecraft: MC\n Valorant: Val \n Fortnite'
 @bot.slash_command(guild_ids=[877460893439512627])
 async def setup(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
     """Set up your personal profile using this command"""
     await ctx.defer()
+    #remember to remove below
     channel = bot.get_channel(12345)
     x = Profiles.profiles(ctx.author.id)
     #embed = discord.Embed(title=f'New Profile Setup by {ctx.author}',color=0xCC071F)
@@ -141,7 +141,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
     #await channel.send(embed = embed)
     perp = Profiles.blacklisted(ctx.author.id)
     if perp != None:
-        embed = discord.Embed(title=f'Error: You have been blacklisted from our services for: {perp.get("reason")} ',description='If You wish to appeal your sentence than please join our support server [here](https://discord.gg/5XAubY2v3N) and open a ticket.',color=0xCC071F)
+        embed = discord.Embed(title=f'Error: You have been blacklisted from our services for: {perp.get("reason")} ',description='If You wish to appeal your ban than please join our support server [here](https://discord.gg/5XAubY2v3N) and open a ticket.',color=0xCC071F)
         await ctx.respond(embed = embed)
     else:
         if x != None:
