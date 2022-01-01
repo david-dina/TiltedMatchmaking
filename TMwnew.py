@@ -771,7 +771,7 @@ async def cancel(ctx):
             elif answer.content == 'N' or answer.content == 'No' or answer.content == 'no' or answer.content == 'n':
                 await ctx.respond('Ok, Not cancelling your search.')
 
-#hey
+
 @bot.slash_command(guild_ids=[877460893439512627])
 async def addgame(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
     #"Rocket League", "Roblox", "Minecraft", "Valorant", "Fortnite"
