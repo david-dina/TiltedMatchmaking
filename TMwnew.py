@@ -43,7 +43,6 @@ async def on_command(ctx):
     channel = bot.get_channel(827601440666288139)
     await channel.send(f'`{ctx.command}` was used')
 
-
 @bot.event
 async def on_member_join(member):
     if member.guild.id == 802368481840332820:
@@ -152,7 +151,9 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 embed = discord.Embed(title='What is your Rocket League rank?',description='The ranks are from lowest to highest:** bronze, silver, gold, platinum, diamond,champion, gc, ssl**',color=0xCC071F)
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='Please also just put your rank not tier.',inline=False)
                 embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
-                embed.set_footer(text='When saying your rank please do it as exactly as you see above.')
+                async def button_callback(interaction:discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        rank = interaction.id
                 button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
@@ -160,6 +161,13 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 button5 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
                 button6 = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
                 button7 = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                button4.callback = button_callback
+                button5.callback = button_callback
+                button6.callback = button_callback
+                button7.callback = button_callback
                 view = View()
                 view.add_item(button1)
                 view.add_item(button2)
