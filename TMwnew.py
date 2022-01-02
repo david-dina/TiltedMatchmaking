@@ -123,9 +123,9 @@ async def on_guild_remove(guild):
     await ctx.send(embed = embed)
 #Remember to remove below
 supported = ['yes']
-
+region = ['NA', 'na', 'EU', 'eu', 'SA', 'sa', 'Asia', 'asia', 'Australia', 'australia']
 @bot.slash_command(guild_ids=[877460893439512627])
-async def setup(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
+async def setup(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games),region:Option(str,"Your closest location. For games that rely on ping.",required=True,choices=region)):
     """Set up your personal profile using this command"""
     await ctx.defer()
     #remember to remove below
@@ -151,10 +151,19 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 embed = discord.Embed(title='What is your Rocket League rank?',color=0xCC071F)
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='\u200b',inline=False)
                 embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
+                rank = None
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
                         rank = interaction.id
-                        interaction.response.edit_message(content=f"You chose {rank}",view=None)
+                        interaction.response.edit_message(content=f"You chose {rank}.",view=None)
+                        Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                        profiling.insert_one(Profile)
+                        embed = discord.Embed(title='Succesfully set up your account',
+                                              description='If you want to find a partner right away then try my `TM!search` command.',
+                                              color=0xCC071F)
+                        rl = {'user': ctx.author.id, 'rank': f'{rank}'}
+                        RL.insert_one(rl)
+                        await ctx.respond(embed=embed)
                 button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
@@ -179,39 +188,6 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 view.add_item(button7)
                 await ctx.respond(embed=embed,view=view)
 
-                def check(message):
-                    return message.content in rank and (message.channel == ctx.channel) and (message.author == ctx.author)
-                try:
-                    answer = await bot.wait_for('button_click', timeout=30, check=check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('You didnt respond... Cancelling setup.')
-                else:
-                    region = ['NA', 'na', 'EU', 'eu', 'SA', 'sa', 'Asia', 'asia', 'Australia', 'australia']
-                    embed = discord.Embed(title='Where are you from?',
-                                          description='We need this information in order to find people who are nearest to you. so you wont have to worry about latency.(for games that require it.)',
-                                          color=0xCC071F)
-                    embed.add_field(name='The supported locations are as followed.',
-                                    value='North America: NA \n South America: SA \n Europe: EU \n Asia \n Australia')
-                    embed.set_footer(
-                        text='If there is a location that is not currently supported that you would like Suggest it using TM!suggest.')
-                    await ctx.respond(embed=embed)
-
-                    def check(message):
-                        return message.content in region and message.author == ctx.author and message.channel == ctx.channel
-
-                    try:
-                        location = await bot.wait_for('message', timeout=30, check=check)
-                    except asyncio.TimeoutError:
-                        await channel.send('You didnt respond... Cancelling setup.')
-                    else:
-                        location = location.content.lower()
-                        Profile = {'user': ctx.author.id, 'region': f'{location}'}
-                        profiling.insert_one(Profile)
-                    answer = answer.content.lower()
-                    embed = discord.Embed(title='Succesfully set up your account',description='If you want to find a partner right away then try my `TM!search` command.',color=0xCC071F)
-                    rl = {'user': ctx.author.id,'rank':f'{answer}'}
-                    RL.insert_one(rl)
-                    await ctx.respond(embed = embed)
             elif game =='Roblox':
                 embed = discord.Embed(title='What is your Roblox username?',color=0xCC071F)
                 await ctx.respond(embed = embed)
