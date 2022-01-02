@@ -33,7 +33,7 @@ supported_games = ["Rocket League","Roblox","Minecraft","Valorant","Fortnite"]
 intents = discord.Intents.all()
 
 
-bot = commands.Bot(intents=intents,status=discord.Status.dnd,activity=discord.Activity(name='Coming back to you soon!',type=discord.ActivityType.watching))
+bot = commands.Bot(command_prefix='TM!',intents=intents,status=discord.Status.dnd,activity=discord.Activity(name='Coming back to you soon!',type=discord.ActivityType.watching))
 bot.remove_command('help')
 UserProfiles = UserProfiles(bot)
 Profiles = Profiles()
@@ -87,8 +87,8 @@ async def on_command_error(ctx,error):
     elif isinstance(error,commands.MissingPermissions):
         return
     else:
-        await ctx.respond(error)
-        await ctx.respond('If this problem consists, please join our support and send a screenshot of your issue.')
+        await ctx.send(error)
+        await ctx.send('If this problem consists, please join our support and send a screenshot of your issue.')
 
 
 @bot.event
@@ -123,7 +123,7 @@ async def on_guild_remove(guild):
     await ctx.send(embed = embed)
 #Remember to remove below
 supported = ['yes']
-region = ['NA', 'na', 'EU', 'eu', 'SA', 'sa', 'Asia', 'asia', 'Australia', 'australia']
+region = ['North America', 'Europe', 'South America','Asia','Australia']
 @bot.slash_command(guild_ids=[877460893439512627])
 async def setup(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games),region:Option(str,"Your closest location. For games that rely on ping.",required=True,choices=region)):
     """Set up your personal profile using this command"""
@@ -155,7 +155,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
                         rank = interaction.id
-                        interaction.response.edit_message(content=f"You chose {rank}.",view=None)
+                        await interaction.response.edit_message(content=f"You chose {rank}.",view=None)
                         Profile = {'user': ctx.author.id, 'region': f'{region}'}
                         profiling.insert_one(Profile)
                         embed = discord.Embed(title='Succesfully set up your account',
@@ -1083,27 +1083,28 @@ async def update():
         else:
             return
 
-@bot.command(aliases=['deleteprofile','DP','dprofile'])
-@commands.max_concurrency(1,per=BucketType.user,wait=False)
+@bot.slash_command(guild_ids=[877460893439512627])
 async def delprofile(ctx):
     """Delete your profile."""
+    async def button_callback(interaction:discord.Interaction):
+        if ctx.author.id == interaction.user.id:
+            if interaction.id == 'Delete':
+                Profiles.deletion(ctx.author.id)
+                await interaction.response.send_message('successfully deleted',ephemeral=True)
+            else:
+                await interaction.response.send_message(content='Not deleting your profile.', ephemeral=True)
+                return
+            await interaction.response.edit_message(view=None)
     embed=discord.Embed(title='Are you sure you want to delete your profile.',description='If you say yes you lose all the games set up with your account and you will have to reset it up.',color=0xCC071F)
-    await ctx.respond(embed = embed)
-    abcd = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
-    def check(message):
-        return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
-    try:
-        gotti = await bot.wait_for('message',timeout=30,check=check)
-    except asyncio.TimeoutError:
-        await ctx.respond("You took to long... Cancelling deletion.")
-    else:
-        if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-            Profiles.deletion(ctx.author.id)
-            await ctx.respond('succesfully deleted')
-        elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-            await ctx.respond('Ok, Not deleting Your profile.')
-
-@bot.command(aliases=['account'])
+    button = Button(custom_id='Cancel',label='Cancel',style=discord.ButtonStyle.primary)
+    button1 = Button(custom_id='Delete',label='Delete',style=discord.ButtonStyle.danger)
+    button.callback = button_callback
+    button1.callback = button_callback
+    view = View()
+    view.add_item(button)
+    view.add_item(button1)
+    await ctx.respond(embed = embed,view=view)
+@bot.slash_command(guild_ids=[877460893439512627])
 async def profile(ctx,user:discord.User = None):
     """Check out your profile"""
     if user == None:
@@ -1120,7 +1121,7 @@ async def profile(ctx,user:discord.User = None):
         x = rbx.find_one({'user':user.id})
         if x != None:
             embed.add_field(name='Roblox', value=f'Username: {x.get("name")}', inline=False)
-        embed.set_thumbnail(url=user.avatar_url)
+        embed.set_thumbnail(url=user.avatar.url)
         x = MC.find_one({'user':user.id})
         if x != None:
             embed.add_field(name='Minecraft',value=f'IGN: {x.get("IGN")} \n Platform: {x.get("platform")}', inline=False)
