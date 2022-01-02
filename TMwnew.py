@@ -1087,13 +1087,11 @@ async def delprofile(ctx):
     """Delete your profile."""
     async def button_callback(interaction:discord.Interaction):
         if ctx.author.id == interaction.user.id:
-            if interaction.id == 'Delete':
+            if interaction.data.get('custom_id') == 'Delete':
                 Profiles.deletion(ctx.author.id)
-                await interaction.response.send_message('successfully deleted',ephemeral=True)
+                await interaction.response.edit_message(content="successfully deleted.",embed=None,view=None)
             else:
-                await interaction.response.send_message(content='Not deleting your profile.', ephemeral=True)
-                return
-            await interaction.response.edit_message(view=None)
+                await interaction.response.edit_message(content="Not deleting your profile.",embed=None,view=None)
     embed=discord.Embed(title='Are you sure you want to delete your profile.',description='If you say yes you lose all the games set up with your account and you will have to reset it up.',color=0xCC071F)
     button = Button(custom_id='Cancel',label='Cancel',style=discord.ButtonStyle.primary)
     button1 = Button(custom_id='Delete',label='Delete',style=discord.ButtonStyle.danger)
