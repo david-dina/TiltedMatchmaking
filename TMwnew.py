@@ -186,6 +186,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 button6.callback = button_callback
                 button7.callback = button_callback
                 button8.callback = button_callback
+                cancel.callback = button_callback
                 view = View()
                 view.add_item(button1)
                 view.add_item(button2)
@@ -195,6 +196,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 view.add_item(button5)
                 view.add_item(button6)
                 view.add_item(button7)
+                view.add_item(cancel)
 
                 await ctx.respond(embed=embed,view=view)
             elif game =='Roblox':
