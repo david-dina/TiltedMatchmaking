@@ -90,7 +90,6 @@ async def on_command_error(ctx,error):
         await ctx.send(error)
         await ctx.send('If this problem consists, please join our support and send a screenshot of your issue.')
 
-
 @bot.event
 async def on_guild_join(guild):
     embed = discord.Embed(
