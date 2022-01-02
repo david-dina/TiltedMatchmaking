@@ -187,7 +187,6 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 view.add_item(button6)
                 view.add_item(button7)
                 await ctx.respond(embed=embed,view=view)
-
             elif game =='Roblox':
                 embed = discord.Embed(title='What is your Roblox username?',color=0xCC071F)
                 await ctx.respond(embed = embed)
@@ -198,27 +197,8 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 except asyncio.TimeoutError:
                     await ctx.respond('You didnt respond... Cancelling setup.')
                 else:
-                    region = ['NA', 'na', 'EU', 'eu', 'SA', 'sa', 'Asia', 'asia', 'Australia', 'australia']
-                    embed = discord.Embed(title='Where are you from?',
-                                          description='We need this information in order to find people who are nearest to you. so you wont have to worry about latency.(for games that require it.)',
-                                          color=0xCC071F)
-                    embed.add_field(name='The supported locations are as followed.',
-                                    value='North America: NA \n South America: SA \n Europe: EU \n Asia \n Australia')
-                    embed.set_footer(
-                        text='If there is a location that is not currently supported that you would like Suggest it using TM!suggest.')
-                    await ctx.respond(embed=embed)
-
-                    def check(message):
-                        return message.content in region and message.author == ctx.author and message.channel == ctx.channel
-
-                    try:
-                        location = await bot.wait_for('message', timeout=30, check=check)
-                    except asyncio.TimeoutError:
-                        await channel.send('You didnt respond... Cancelling setup.')
-                    else:
-                        location = location.content.lower()
-                        Profile = {'user': ctx.author.id, 'region': f'{location}'}
-                        profiling.insert_one(Profile)
+                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                    profiling.insert_one(Profile)
                     embed = discord.Embed(title='Succesfully set up your account',
                                           description='If you want to find a partner right away then try my `TM!search` command.',
                                           color=0xCC071F)
