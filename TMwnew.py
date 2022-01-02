@@ -1110,7 +1110,10 @@ async def profile(ctx,user:discord.User = None):
         user = ctx.author
     x = Profiles.profiles(user.id)
     if x == None:
-        await ctx.respond('Error: user doesnt have a profile. Set up one using the `TM!setup` command')
+        if user.id != ctx.author.id:
+            await ctx.respond('Error: User doesnt have a profile.')
+        else:
+            await ctx.respond('Error: user doesnt have a profile. Set up one using the `TM!setup` command')
     else:
         embed = discord.Embed(title=f'Profile for {user}',description=f'Region: {x.get("region")} ',color=0xCC071F)
         x = Profiles.rocket(user.id)
