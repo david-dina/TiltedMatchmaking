@@ -161,14 +161,14 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                             await interaction.response.edit_message(embed=embed2,view=None)
                             Profile = {'user': ctx.author.id, 'region': f'{region}'}
                             profiling.insert_one(Profile)
-                            embed = discord.Embed(title='Succesfully set up your account',
+                            embed = discord.Embed(title='Successfully set up your account',
                                                   description='If you want to find a partner right away then try my `TM!search` command.',
                                                   color=0xCC071F)
                             rl = {'user': ctx.author.id, 'rank': f'{rank}'}
                             RL.insert_one(rl)
                             await ctx.respond(embed=embed)
                         else:
-                            await interaction.response.edit_message(content="Canceled",embed=None, view=None)
+                            await interaction.response.edit_message(content="Cancelled",embed=None, view=None)
                 button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
