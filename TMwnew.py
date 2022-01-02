@@ -170,6 +170,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
                 button4 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
+                button8 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Diamond')
                 button5 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
                 button6 = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
                 button7 = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
@@ -180,14 +181,17 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 button5.callback = button_callback
                 button6.callback = button_callback
                 button7.callback = button_callback
+                button8.callback = button_callback
                 view = View()
                 view.add_item(button1)
                 view.add_item(button2)
                 view.add_item(button3)
                 view.add_item(button4)
+                view.add_item(button8)
                 view.add_item(button5)
                 view.add_item(button6)
                 view.add_item(button7)
+
                 await ctx.respond(embed=embed,view=view)
             elif game =='Roblox':
                 embed = discord.Embed(title='What is your Roblox username?',color=0xCC071F)
