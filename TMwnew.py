@@ -151,10 +151,13 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='\u200b',inline=False)
                 embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
                 rank = None
+                embed2 = discord.Embed(title='What is your Rocket League rank?',color=0xCC071F)
+                embed2.add_field(name=f'You chose {rank}',value='\u200b')
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
-                        rank = interaction.id
-                        await interaction.response.edit_message(content=f"You chose {rank}.",view=None)
+                        rank = interaction.data.get('custom_id')
+                        embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                        await interaction.response.edit_message(embed=embed2,view=None)
                         Profile = {'user': ctx.author.id, 'region': f'{region}'}
                         profiling.insert_one(Profile)
                         embed = discord.Embed(title='Succesfully set up your account',
