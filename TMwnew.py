@@ -155,25 +155,29 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 embed2.add_field(name=f'You chose {rank}',value='\u200b')
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
-                        rank = interaction.data.get('custom_id')
-                        embed2.add_field(name=f'You chose {rank}', value='\u200b')
-                        await interaction.response.edit_message(embed=embed2,view=None)
-                        Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                        profiling.insert_one(Profile)
-                        embed = discord.Embed(title='Succesfully set up your account',
-                                              description='If you want to find a partner right away then try my `TM!search` command.',
-                                              color=0xCC071F)
-                        rl = {'user': ctx.author.id, 'rank': f'{rank}'}
-                        RL.insert_one(rl)
-                        await ctx.respond(embed=embed)
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2,view=None)
+                            Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                            profiling.insert_one(Profile)
+                            embed = discord.Embed(title='Succesfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            rl = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            RL.insert_one(rl)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Canceled",embed=None, view=None)
                 button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
                 button4 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
-                button8 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Diamond')
+                button8 = Button(label="Diamond", style=discord.ButtonStyle.primary, custom_id='Diamond')
                 button5 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
                 button6 = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
                 button7 = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
+                cancel = Button(label="Cancel",style=discord.ButtonStyle.danger,custom_id="Cancel")
                 button1.callback = button_callback
                 button2.callback = button_callback
                 button3.callback = button_callback
