@@ -360,12 +360,6 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                     fort.insert_one({'user': ctx.author.id, 'rank': f'{rank}'})
                     await ctx.respond(embed=embed)
 
-
-
-
-
-
-
 @setup.error
 async def setup_error(ctx,error):
     if isinstance(error,commands.MaxConcurrencyReached):
