@@ -204,6 +204,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                                           color=0xCC071F)
                     await ctx.respond(embed = embed)
                     rbx.insert_one({'user':ctx.author.id,'name':f'{answer.content}'})
+            #figure out how to find multiple options with MC and take options and take and respond. Try without message content input
             elif game == 'Minecraft':
                 embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
                 await ctx.respond(embed=embed)
