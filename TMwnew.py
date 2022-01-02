@@ -148,12 +148,13 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
             return
         else:
             if game == 'Rocket League':
-                embed = discord.Embed(title='What is your Rocket League rank?',description='The ranks are from lowest to highest:** bronze, silver, gold, platinum, diamond,champion, gc, ssl**',color=0xCC071F)
-                embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='Please also just put your rank not tier.',inline=False)
+                embed = discord.Embed(title='What is your Rocket League rank?',color=0xCC071F)
+                embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='\u200b',inline=False)
                 embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
                         rank = interaction.id
+                        interaction.response.edit_message(content=f"You chose {rank}",view=None)
                 button1 = Button(label="Bronze",style=discord.ButtonStyle.primary,custom_id='Bronze')
                 button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
                 button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
