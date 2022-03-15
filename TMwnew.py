@@ -447,12 +447,14 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
             await ctx.respond('Error you didn\'t set up your profile. Please do `/setup` to do that.')
         else:
             if game == 'Rocket League':
+                if x == None:
+                    await ctx.respond('Error you dont have Rocket League added to your profile. Please do `/addgame` to do that.')
+                    return
                 embed = discord.Embed(title='Now Searching for teammates for the game: Rocket League',description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',color=0xCC071F)
                 await ctx.respond(embed = embed)
                 info = {'game':'RL','rank': f"{x.get('rank')}",'region':f"{z.get('region')}"}
                 y = match.find(info)
-                num = match.count(info)
-                if num == 0:
+                if y:
                     y = dict(y)
                 for info in y:
                     id = info.get('user')
@@ -474,7 +476,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
 
             elif game == 'Roblox':
                 if rbx.find_one({'user':ctx.author.id}) == None:
-                    await ctx.respond('Error: You havnt added this game to your profile. Please do that with `TM!addgame`.')
+                    await ctx.respond('Error: You havnt added this game to your profile. Please do that with `/addgame`.')
                 else:
                     embed = discord.Embed(title='Now Searching for teammates for the game: Roblox',
                                           description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
@@ -482,8 +484,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                     await ctx.respond(embed=embed)
                     info = {'game': 'RBX', 'region': f"{z.get('region')}"}
                     y = match.find(info)
-                    num = match.count(info)
-                    if num == 0:
+                    if y:
                         y = dict(y)
                     for info in y:
                         id = info.get('user')
@@ -507,7 +508,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                             match.insert_one(info)
             elif game == 'Minecraft':
                 if MC.find_one({'user':ctx.author.id}) == None:
-                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
                 else:
                     embed = discord.Embed(title='Now Searching for teammates for the game: Minecraft',
                                       description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
@@ -523,8 +524,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                         info = {'game': 'MC', 'region': f"{z.get('region')}",
                                 'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}'}
                     y = match.find(info)
-                    num = match.count(info)
-                    if num == 0:
+                    if y:
                         y = dict(y)
                     for info in y:
                         id = info.get('user')
@@ -559,7 +559,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                             match.insert_one(info)
             elif game == 'Valorant':
                 if val.find_one({'user':ctx.author.id}) == None:
-                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
                 else:
                     embed = discord.Embed(title='Now Searching for teammates for the game: Valorant',
                                           description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
@@ -568,8 +568,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                     x = val.find_one({'user':ctx.author.id})
                     info = {'game': 'Val', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
                     y = match.find(info)
-                    num = match.count(info)
-                    if num == 0:
+                    if y:
                         y = dict(y)
                     for info in y:
                         id = info.get('user')
@@ -593,7 +592,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                             match.insert_one(info)
             elif game == 'Fortnite':
                 if fort.find_one({'user':ctx.author.id}) == None:
-                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
                 else:
                     embed = discord.Embed(title='Now Searching for teammates for the game: Fortnite',
                                           description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
@@ -602,8 +601,7 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                     x = fort.find_one({'user':ctx.author.id})
                     info = {'game': 'Fort', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
                     y = match.find(info)
-                    num = match.count(info)
-                    if num == 0:
+                    if y:
                         y = dict(y)
                     for info in y:
                         id = info.get('user')
@@ -658,6 +656,7 @@ async def cancel(ctx):
         button2.callback = button_callback
         view.add_item(button1)
         view.add_item(button2)
+        await ctx.respond(embed=embed,view=view)
 @bot.slash_command(guild_ids=[877460893439512627])
 async def addgame(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
     #"Rocket League", "Roblox", "Minecraft", "Valorant", "Fortnite"
@@ -1095,7 +1094,7 @@ async def removegame(ctx,game:Option(str,"The game you want removed",required=Tr
         view.add_item(button1)
         view.add_item(cancel)
         await ctx.respond(embed=embed,view=view)
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def suggest(ctx):
     """Suggest features and or games for the bot"""
     embed = discord.Embed(title='Thanks for making a suggestion.',description='Whatever your next message is will be send as a suggestion. Please try to be a through as you can.',color=0xCC071F)
@@ -1114,10 +1113,10 @@ async def suggest(ctx):
         channel = bot.get_channel(822858852143464558)
         await channel.send(embed = embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def report(ctx):
     """report users."""
-    embed = discord.Embed(title='Thank you for using our report feature to try and help keep our community troll-free',description='Now when submitting your report please include all of the following... Who are you reporting. Why are you reporting(include name and discrim or just user id your choice). and any sort of evidence.(pictures are accepted)',color=0xCC071F)
+    embed = discord.Embed(title='Thank you for using our report feature to try and help keep our community troll-free',description='Now when submitting your report please include all of the following... Who are you reporting. Why are you reporting(include name and # or just user id. Your choice.). Add any sort of evidence.(pictures are accepted).',color=0xCC071F)
     await ctx.respond(embed = embed)
     def check(message):
         return message.author == ctx.author and message.channel == ctx.message.channel
@@ -1143,17 +1142,23 @@ async def getid(ctx,user:discord.User):
     else:
         await ctx.respond('Couldnt find user...')
 
-@bot.command(hidden=True,aliases = ['BL'])
-async def blacklist(ctx,func,user:discord.User,*,reason=None):
+@bot.slash_command(guild_ids=[877460893439512627])
+async def blacklist(ctx,func:Option(str,"what your doing to the blacklist",required=True,choices=['add','remove','find']),user:discord.User,*,reason=None):
     if ctx.author.id == 705992469426339841:
-        if func == 'add' or func =='Add':
-            await ctx.respond(f'Added {user}')
+        if func == 'add':
+            if reason == None:
+                await ctx.respond("please add a reason.")
+                return
+            await ctx.respond(f'Added {user}. Reason: {reason}')
             BL.insert_one({'user': user.id, 'reason': f'{reason}'})
-        elif func == 'remove' or func =='Delete' or 'func' == 'delete' or func == 'Del':
+        elif func == 'remove':
             BL.delete_one({'user':user.id})
-            await ctx.respond(f'Deleted {user}')
-        elif func =='Find' or func == 'find':
+            await ctx.respond(f'Removed {user}')
+        elif func == 'find':
             x = BL.find_one({'user':user.id})
+            if x == None:
+                await ctx.respond("User not found in blacklist")
+                return
             await ctx.respond(f'Blacklist for {user}: {x.get("reason")}')
     else:
         return
@@ -1162,7 +1167,7 @@ async def blacklist(ctx,func,user:discord.User,*,reason=None):
 async def bl_error(ctx,error):
     await ctx.respond(error)
 
-@bot.command(hidden=True)
+@bot.slash_command(guild_ids=[877460893439512627])
 async def admindelete(ctx,user:discord.User):
     if ctx.author.id == 705992469426339841:
         user = user.id
@@ -1180,7 +1185,7 @@ async def update():
         time = time + 1
         match.update_one({"user":user},{"$set": {"time":time}})
         if time >= 60:
-            embed = discord.Embed(title='It has been an hour and no one has been matched with you.',description='You could either do the following: Requeue using `TM!search` or just wait for a little bit of time for some other users who are the same rank as you to queue aswell: sorry for the inconvience',color=0xCC071F)
+            embed = discord.Embed(title='It has been an hour and no one has been matched with you.',description='You could either do the following: Requeue using `/search` or just wait for a little bit of time for some other users who are the same rank as you to queue aswell: sorry for the inconvience',color=0xCC071F)
             embed.set_footer(text='Thank you for using our services.')
             match.delete_one({"user":user})
             user = int(user)
