@@ -428,37 +428,59 @@ async def setup_error(ctx,error):
     #embed.set_footer(text='If a game your play isnt on here and you want it to be added try the TM!suggest command')
     #await ctx.respond(embed = embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 @commands.max_concurrency(1,per=BucketType.user,wait=False)
 @commands.guild_only()
-async def search(ctx):
+async def search(ctx,game:Option(str,"The game to search a partner for",required=True,choices=supported_games)):
     """Search for a teammate."""
     user = None
     looking = {'user':ctx.author.id}
     found = match.find_one(looking)
     if found != None:
         await ctx.respond(
-            'Error: You already have a search running. If you are trying to cancel your search please do the `TM!cancel` command.')
+            'Error: You already have a search running. If you are trying to cancel your search please do the `/cancel` command.')
     else:
         info = {'user': ctx.author.id}
         x = RL.find_one(info)
         z = profiling.find_one(info)
         if z == None:
-            await ctx.respond('Error you didn\'t set up your profile. Please do `TM!setup` to do that.')
+            await ctx.respond('Error you didn\'t set up your profile. Please do `/setup` to do that.')
         else:
-            embed = discord.Embed(title='What game are you trying to find a teammate for?',description='Make sure you have the game set up in your profile.',color=0xCC071F)
-            await ctx.respond(embed = embed)
-            def check(message):
-                return message.content in supported and message.author == ctx.author and message.channel == ctx.message.channel
-            try:
-                game = await bot.wait_for('message',timeout=30,check = check)
-            except asyncio.TimeoutError:
-                await ctx.respond('You took to long to answer...Cancelling.')
-            else:
-                if game.content == 'RL' or game.content == 'rl':
-                    embed = discord.Embed(title='Now Searching for teammates for the game: Rocket League',description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',color=0xCC071F)
-                    await ctx.respond(embed = embed)
-                    info = {'game':'RL','rank': f"{x.get('rank')}",'region':f"{z.get('region')}"}
+            if game == 'Rocket League':
+                embed = discord.Embed(title='Now Searching for teammates for the game: Rocket League',description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',color=0xCC071F)
+                await ctx.respond(embed = embed)
+                info = {'game':'RL','rank': f"{x.get('rank')}",'region':f"{z.get('region')}"}
+                y = match.find(info)
+                num = match.count(info)
+                if num == 0:
+                    y = dict(y)
+                for info in y:
+                    id = info.get('user')
+                    user = bot.get_user(id)
+                if not y:
+                    info = {'game':'RL','user': ctx.author.id, 'rank': f"{x.get('rank')}",'region':f"{z.get('region')}", 'time': 0}
+                    match.insert_one(info)
+                if user == None:
+                    return
+                else:
+                    mel = await UserProfiles.teammateyes(ctx,user)
+                    if mel == False:
+                        embed=discord.Embed(title='Alright. Removing you from the Queue.',description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',color=0xCC071F)
+                        await user.send(embed = embed)
+                        match.delete_one({"user": user.id})
+                        info = {'game':'RL','user': ctx.author.id, 'rank': f"{x.get('rank')}",'region':f"{z.get('region')}", 'time': 0}
+                        match.insert_one(info)
+
+
+            elif game == 'Roblox':
+                if rbx.find_one({'user':ctx.author.id}) == None:
+                    await ctx.respond('Error: You havnt added this game to your profile. Please do that with `TM!addgame`.')
+                else:
+                    embed = discord.Embed(title='Now Searching for teammates for the game: Roblox',
+                                          description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
+                                          color=0xCC071F)
+                    await ctx.respond(embed=embed)
+                    info = {'game': 'RBX', 'region': f"{z.get('region')}"}
                     y = match.find(info)
                     num = match.count(info)
                     if num == 0:
@@ -467,213 +489,175 @@ async def search(ctx):
                         id = info.get('user')
                         user = bot.get_user(id)
                     if not y:
-                        info = {'game':'RL','user': ctx.author.id, 'rank': f"{x.get('rank')}",'region':f"{z.get('region')}", 'time': 0}
+                        info = {'user': ctx.author.id, 'game': "RBX", 'region': f"{z.get('region')}",
+                                'time': 0}
                         match.insert_one(info)
                     if user == None:
                         return
                     else:
-                        mel = await UserProfiles.teammateyes(ctx,user)
+                        mel = await UserProfiles.teammateyes(ctx, user)
                         if mel == False:
-                            embed=discord.Embed(title='Alright. Removing you from the Queue.',description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',color=0xCC071F)
-                            await user.send(embed = embed)
+                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                                                  color=0xCC071F)
+                            await user.send(embed=embed)
                             match.delete_one({"user": user.id})
-                            info = {'game':'RL','user': ctx.author.id, 'rank': f"{x.get('rank')}",'region':f"{z.get('region')}", 'time': 0}
-                            match.insert_one(info)
-
-
-                elif game.content == 'Roblox' or game.content == 'roblox':
-                    if rbx.find_one({'user':ctx.author.id}) == None:
-                        await ctx.respond('Error: You havnt added this game to your profile. Please do that with `TM!addgame`.')
-                    else:
-                        embed = discord.Embed(title='Now Searching for teammates for the game: Roblox',
-                                              description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
-                                              color=0xCC071F)
-                        await ctx.respond(embed=embed)
-                        info = {'game': 'RBX', 'region': f"{z.get('region')}"}
-                        y = match.find(info)
-                        num = match.count(info)
-                        if num == 0:
-                            y = dict(y)
-                        for info in y:
-                            id = info.get('user')
-                            user = bot.get_user(id)
-                        if not y:
                             info = {'user': ctx.author.id, 'game': "RBX", 'region': f"{z.get('region')}",
                                     'time': 0}
                             match.insert_one(info)
-                        if user == None:
-                            return
-                        else:
-                            mel = await UserProfiles.teammateyes(ctx, user)
-                            if mel == False:
-                                embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                      description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                      color=0xCC071F)
-                                await user.send(embed=embed)
-                                match.delete_one({"user": user.id})
-                                info = {'user': ctx.author.id, 'game': "RBX", 'region': f"{z.get('region')}",
-                                        'time': 0}
-                                match.insert_one(info)
-                elif game.content == 'MC' or game.content == 'mc' or game.content == 'Mc':
-                    if MC.find_one({'user':ctx.author.id}) == None:
-                        await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+            elif game == 'Minecraft':
+                if MC.find_one({'user':ctx.author.id}) == None:
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                else:
+                    embed = discord.Embed(title='Now Searching for teammates for the game: Minecraft',
+                                      description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
+                                      color=0xCC071F)
+                    await ctx.respond(embed = embed)
+                    yz = MC.find_one({'user':ctx.author.id})
+                    if yz.get('stars') != None:
+                        star = Profiles.MC_ranks(yz.get('stars'))
+                        info = {'game': 'MC', 'region': f"{z.get('region')}",
+                                'rank': f'{star}',
+                                'platform': f'{yz.get("platform")}'}
                     else:
-                        embed = discord.Embed(title='Now Searching for teammates for the game: Minecraft',
-                                          description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
-                                          color=0xCC071F)
-                        await ctx.respond(embed = embed)
-                        yz = MC.find_one({'user':ctx.author.id})
+                        info = {'game': 'MC', 'region': f"{z.get('region')}",
+                                'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}'}
+                    y = match.find(info)
+                    num = match.count(info)
+                    if num == 0:
+                        y = dict(y)
+                    for info in y:
+                        id = info.get('user')
+                        user = bot.get_user(id)
+                    if not y:
                         if yz.get('stars') != None:
                             star = Profiles.MC_ranks(yz.get('stars'))
-                            info = {'game': 'MC', 'region': f"{z.get('region')}",
-                                    'rank': f'{star}',
-                                    'platform': f'{yz.get("platform")}'}
+                            info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}", 'rank': f'{star}',
+                                    'platform': f'{yz.get("platform")}','time':0}
                         else:
-                            info = {'game': 'MC', 'region': f"{z.get('region')}",
-                                    'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}'}
-                        y = match.find(info)
-                        num = match.count(info)
-                        if num == 0:
-                            y = dict(y)
-                        for info in y:
-                            id = info.get('user')
-                            user = bot.get_user(id)
-                        if not y:
+                            info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}",
+                                    'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
+                        match.insert_one(info)
+                    if user == None:
+                        return
+                    else:
+                        mel = await UserProfiles.teammateyes(ctx, user)
+                        if mel == False:
+                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                                                  color=0xCC071F)
+                            await user.send(embed=embed)
+                            match.delete_one({"user": user.id})
                             if yz.get('stars') != None:
                                 star = Profiles.MC_ranks(yz.get('stars'))
-                                info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}", 'rank': f'{star}',
-                                        'platform': f'{yz.get("platform")}','time':0}
+                                info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
+                                        'rank': f'{star}',
+                                        'platform': f'{yz.get("platform")}'}
                             else:
-                                info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}",
+                                info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
                                         'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
                             match.insert_one(info)
-                        if user == None:
-                            return
-                        else:
-                            mel = await UserProfiles.teammateyes(ctx, user)
-                            if mel == False:
-                                embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                      description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                      color=0xCC071F)
-                                await user.send(embed=embed)
-                                match.delete_one({"user": user.id})
-                                if yz.get('stars') != None:
-                                    star = Profiles.MC_ranks(yz.get('stars'))
-                                    info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
-                                            'rank': f'{star}',
-                                            'platform': f'{yz.get("platform")}'}
-                                else:
-                                    info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
-                                            'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
-                                match.insert_one(info)
-                elif game.content == 'Val' or game.content == 'val':
-                    if val.find_one({'user':ctx.author.id}) == None:
-                        await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+            elif game == 'Valorant':
+                if val.find_one({'user':ctx.author.id}) == None:
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                else:
+                    embed = discord.Embed(title='Now Searching for teammates for the game: Valorant',
+                                          description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
+                                          color=0xCC071F)
+                    await ctx.respond(embed=embed)
+                    x = val.find_one({'user':ctx.author.id})
+                    info = {'game': 'Val', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
+                    y = match.find(info)
+                    num = match.count(info)
+                    if num == 0:
+                        y = dict(y)
+                    for info in y:
+                        id = info.get('user')
+                        user = bot.get_user(id)
+                    if not y:
+                        info = {'game': 'Val', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
+                                'region': f"{z.get('region')}", 'time': 0}
+                        match.insert_one(info)
+                    if user == None:
+                        return
                     else:
-                        embed = discord.Embed(title='Now Searching for teammates for the game: Valorant',
-                                              description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
-                                              color=0xCC071F)
-                        await ctx.respond(embed=embed)
-                        x = val.find_one({'user':ctx.author.id})
-                        info = {'game': 'Val', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                        y = match.find(info)
-                        num = match.count(info)
-                        if num == 0:
-                            y = dict(y)
-                        for info in y:
-                            id = info.get('user')
-                            user = bot.get_user(id)
-                        if not y:
+                        mel = await UserProfiles.teammateyes(ctx, user)
+                        if mel == False:
+                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                                                  color=0xCC071F)
+                            await user.send(embed=embed)
+                            match.delete_one({"user": user.id})
                             info = {'game': 'Val', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
                                     'region': f"{z.get('region')}", 'time': 0}
                             match.insert_one(info)
-                        if user == None:
-                            return
-                        else:
-                            mel = await UserProfiles.teammateyes(ctx, user)
-                            if mel == False:
-                                embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                      description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                      color=0xCC071F)
-                                await user.send(embed=embed)
-                                match.delete_one({"user": user.id})
-                                info = {'game': 'Val', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
-                                        'region': f"{z.get('region')}", 'time': 0}
-                                match.insert_one(info)
-                elif game.content == 'Fortnite' or game.content == 'fortnite':
-                    if fort.find_one({'user':ctx.author.id}) == None:
-                        await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+            elif game == 'Fortnite':
+                if fort.find_one({'user':ctx.author.id}) == None:
+                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `TM!addprofile`.')
+                else:
+                    embed = discord.Embed(title='Now Searching for teammates for the game: Fortnite',
+                                          description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
+                                          color=0xCC071F)
+                    await ctx.respond(embed=embed)
+                    x = fort.find_one({'user':ctx.author.id})
+                    info = {'game': 'Fort', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
+                    y = match.find(info)
+                    num = match.count(info)
+                    if num == 0:
+                        y = dict(y)
+                    for info in y:
+                        id = info.get('user')
+                        user = bot.get_user(id)
+                    if not y:
+                        info = {'game': 'Fort', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
+                                'region': f"{z.get('region')}", 'time': 0}
+                        match.insert_one(info)
+                    if user == None:
+                        return
                     else:
-                        embed = discord.Embed(title='Now Searching for teammates for the game: Fortnite',
-                                              description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
-                                              color=0xCC071F)
-                        await ctx.respond(embed=embed)
-                        x = fort.find_one({'user':ctx.author.id})
-                        info = {'game': 'Fort', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                        y = match.find(info)
-                        num = match.count(info)
-                        if num == 0:
-                            y = dict(y)
-                        for info in y:
-                            id = info.get('user')
-                            user = bot.get_user(id)
-                        if not y:
+                        mel = await UserProfiles.teammateyes(ctx, user)
+                        if mel == False:
+                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                                                  color=0xCC071F)
+                            await user.send(embed=embed)
+                            match.delete_one({"user": user.id})
                             info = {'game': 'Fort', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
                                     'region': f"{z.get('region')}", 'time': 0}
                             match.insert_one(info)
-                        if user == None:
-                            return
-                        else:
-                            mel = await UserProfiles.teammateyes(ctx, user)
-                            if mel == False:
-                                embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                      description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                      color=0xCC071F)
-                                await user.send(embed=embed)
-                                match.delete_one({"user": user.id})
-                                info = {'game': 'Fort', 'user': ctx.author.id, 'rank': f"{x.get('rank')}",
-                                        'region': f"{z.get('region')}", 'time': 0}
-                                match.insert_one(info)
-
-
-
-
-
 
 
 @search.error
 async def search_error(ctx,error):
     if isinstance(error,commands.MaxConcurrencyReached):
-        await ctx.respond('Error: You already have a search running. If you are trying to cancel your search please do the `TM!cancel` command.')
+        await ctx.respond('Error: You already have a search running. If you are trying to cancel your search please do the `/cancel` command.')
 
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def cancel(ctx):
     """cancel your search"""
     x = match.find_one({"user": ctx.author.id})
     if x == None:
         await ctx.respond('You dont have a current running search to cancel.')
     else:
-        embed = discord.Embed(title='Are you sure you want to cancel your search?',description='Yes or No?',color=0xCC071F)
-        await ctx.respond(embed = embed)
-        abcd = ['Yes','yes','y','Y','No','no','n','N']
-        def check(message):
-            return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
-        try:
-            answer = await bot.wait_for('message',timeout=30,check=check)
-        except asyncio.TimeoutError:
-            await ctx.respond('You took to long... Not cancelling your search.')
-        else:
-            if answer.content == 'yes' or answer.content == 'Yes' or answer.content == 'y' or answer.content == 'Y':
+        embed = discord.Embed(title='Are you sure you want to cancel your search?',color=0xCC071F)
+        async def button_callback(interaction:discord.Interaction):
+            ans = interaction.data.get('custom_id')
+            if ans != 'No':
                 try:
                     match.delete_one({"user": ctx.author.id})
-                    await ctx.respond('Search succesfully canclled')
+                    await interaction.response.edit_message(embed=None, view=None,content="Successfully removed from the queue.")
                 except:
-                    await ctx.respond('Having trouble deleting your search. Please try again.')
-            elif answer.content == 'N' or answer.content == 'No' or answer.content == 'no' or answer.content == 'n':
-                await ctx.respond('Ok, Not cancelling your search.')
-
-
+                    await interaction.response.edit_message(embed=None, view=None,content="Having trouble removing from queue. Please try again.")
+            else:
+                await interaction.response.edit_message(embed=None, view=None,content="Not removing from queue.")
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        button2 = Button(label="No", style=discord.ButtonStyle.primary, custom_id='No')
+        view = View()
+        button1.callback = button_callback
+        button2.callback = button_callback
+        view.add_item(button1)
+        view.add_item(button2)
 @bot.slash_command(guild_ids=[877460893439512627])
 async def addgame(ctx,game:Option(str,"The game to setup with",required=True,choices=supported_games)):
     #"Rocket League", "Roblox", "Minecraft", "Valorant", "Fortnite"
