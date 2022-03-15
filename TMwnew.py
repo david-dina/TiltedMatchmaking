@@ -149,10 +149,8 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
             if game == 'Rocket League':
                 embed = discord.Embed(title='What is your Rocket League rank?',color=0xCC071F)
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',value='\u200b',inline=False)
-                embed.add_field(name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
-                rank = None
+                embed.add_field(name='When putting in your rank please be **TRUTHFUL** for this is to help you find a teammate around your rank.',value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
                 embed2 = discord.Embed(title='What is your Rocket League rank?',color=0xCC071F)
-                embed2.add_field(name=f'You chose {rank}',value='\u200b')
                 async def button_callback(interaction:discord.Interaction):
                     if interaction.user.id == ctx.author.id:
                         if interaction.data.get('custom_id') != 'Cancel':
@@ -197,7 +195,6 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                 view.add_item(button6)
                 view.add_item(button7)
                 view.add_item(cancel)
-
                 await ctx.respond(embed=embed,view=view)
             elif game =='Roblox':
                 embed = discord.Embed(title='What is your Roblox username?',color=0xCC071F)
@@ -216,7 +213,7 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                                           color=0xCC071F)
                     await ctx.respond(embed = embed)
                     rbx.insert_one({'user':ctx.author.id,'name':f'{answer.content}'})
-            #figure out how to find multiple options with MC and take options and take and respond. Try without message content input
+    #figure out how to find multiple options with MC and take options and take and respond. Try without message content input
             elif game == 'Minecraft':
                 embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
                 await ctx.respond(embed=embed)
@@ -331,46 +328,91 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                                 MC.insert_one({'user':ctx.author.id,'platform':'bedrock','mode':f'{mode}','IGN':f'{IGN}'})
                                 await ctx.respond(embed = embed)
             elif game == 'Valorant':
-                #add buttons for this
                 embed = discord.Embed(title='What is your Valorant rank?',description='The ranks are from lowest to highest:**bronze, iron, silver, gold, platinum, diamond, immortal, radiant**',color=0xCC071F)
-                embed.add_field(name='Please be Truthful when inserting your rank.',value='If found and reported inserting a incorrect rank you can and will be blacklisted from our services.')
-                await ctx.respond(embed = embed)
-                rank = ['iron','bronze','silver','gold','platinum','diamond','immortal','radiant','Iron','Bronze','Silver','Gold','Platinum','Diamond','Immortal','Radiant']
-                def check(message):
-                    return message.content in rank and message.author == ctx.author and message.channel == ctx.channel
-                try:
-                    rank = await bot.wait_for('message',timeout=45,check = check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('Error: You didnt respond in time... Cancelling setup.')
-                else:
-                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                    profiling.insert_one(Profile)
-                    rank = rank.content.lower()
-                    embed = discord.Embed(title='Succesfully set up your account',
-                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                          color=0xCC071F)
-                    val.insert_one({'user':ctx.author.id,'rank':f'{rank}'})
-                    await ctx.respond(embed = embed)
+                embed.add_field(name='Please be **TRUTHFUL** when inserting your rank.',value='If found and reported inserting a incorrect rank you can and will be blacklisted from our services.')
+                embed2 = discord.Embed(title='What is your Valorant rank?', color=0xCC071F)
+                async def button_callback(interaction: discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2, view=None)
+                            Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                            profiling.insert_one(Profile)
+                            embed = discord.Embed(title='Successfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            VAL = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            val.insert_one(VAL)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Cancelled", embed=None, view=None)
+
+                button1 = Button(label="Iron", style=discord.ButtonStyle.primary, custom_id='Iron')
+                button2 = Button(label="Bronze", style=discord.ButtonStyle.primary, custom_id='Bronze')
+                button3 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
+                button4 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
+                button8 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
+                button5 = Button(label="Diamond", style=discord.ButtonStyle.primary, custom_id='Diamond')
+                button6 = Button(label="Immortal", style=discord.ButtonStyle.primary, custom_id='Immortal')
+                button7 = Button(label="Radiant", style=discord.ButtonStyle.primary, custom_id='Radiant')
+                cancel = Button(label="Cancel", style=discord.ButtonStyle.danger, custom_id="Cancel")
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                button4.callback = button_callback
+                button5.callback = button_callback
+                button6.callback = button_callback
+                button7.callback = button_callback
+                button8.callback = button_callback
+                cancel.callback = button_callback
+                view = View()
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(button4)
+                view.add_item(button8)
+                view.add_item(button5)
+                view.add_item(button6)
+                view.add_item(button7)
+                view.add_item(cancel)
+                await ctx.respond(embed=embed,view=view)
             elif game == 'Fortnite':
-                embed = discord.Embed(title='What League are you currently in?',description='The leagues are from lowest to highest:**Open, Contender, Champion**',color=0xCC071F)
-                await ctx.respond(embed = embed)
+                embed = discord.Embed(title='What league are you currently in?',description='The leagues are from lowest to highest:**Open, Contender, Champion**',color=0xCC071F)
+                embed.add_field(name='Please be **TRUTHFUL** when inserting your league.',value='If found and reported inserting a incorrect league you can and will be blacklisted from our services.')
+                embed2 = discord.Embed(title='What is your Fortnite league?', color=0xCC071F)
                 #buttons for this too
-                rank  = ['open','Open','Contender','contender','Champion','champion']
-                def check(message):
-                    return message.content in rank and message.channel == ctx.channel and message.author == ctx.author
-                try:
-                    rank = await bot.wait_for('message',timeout=30,check =check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('Error: You didnt respond in time... Cancelling setup.')
-                else:
-                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                    profiling.insert_one(Profile)
-                    rank = rank.content.lower()
-                    embed = discord.Embed(title='Succesfully set up your account',
-                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                          color=0xCC071F)
-                    fort.insert_one({'user': ctx.author.id, 'rank': f'{rank}'})
-                    await ctx.respond(embed=embed)
+                async def button_callback(interaction: discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2, view=None)
+                            Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                            profiling.insert_one(Profile)
+                            embed = discord.Embed(title='Successfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            forts = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            fort.insert_one(forts)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Cancelled", embed=None, view=None)
+                button1 = Button(label="Open", style=discord.ButtonStyle.primary, custom_id='Open')
+                button2 = Button(label="Contender", style=discord.ButtonStyle.primary, custom_id='Contender')
+                button3 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
+                cancel = Button(label="Cancel", style=discord.ButtonStyle.danger, custom_id="Cancel")
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                cancel.callback = button_callback
+                view = View()
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(cancel)
+                await ctx.respond(embed=embed, view=view)
+
 
 @setup.error
 async def setup_error(ctx,error):
@@ -1211,4 +1253,4 @@ async def on_raw_reaction_add(payload):
 
 
 update.start()
-bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.heIliLdUJYanfdNbf6iObYIxtLU')
+bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
