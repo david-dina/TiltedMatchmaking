@@ -1343,4 +1343,4 @@ async def on_raw_reaction_add(payload):
 
 
 update.start()
-bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.heIliLdUJYanfdNbf6iObYIxtLU')
+bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
