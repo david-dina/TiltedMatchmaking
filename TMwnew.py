@@ -445,6 +445,7 @@ async def search(ctx):
         z = profiling.find_one(info)
         if z == None:
             await ctx.respond('Error you didn\'t set up your profile. Please do `TM!setup` to do that.')
+        #jus to see sum
         else:
             embed = discord.Embed(title='What game are you trying to find a teammate for?',description='Make sure you have the game set up in your profile.',color=0xCC071F)
             await ctx.respond(embed = embed)
