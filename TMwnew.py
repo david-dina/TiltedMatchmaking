@@ -420,13 +420,13 @@ async def setup_error(ctx,error):
         await ctx.respond('Your already running this command.')
 
 
-@bot.command()
-async def games(ctx):
-    """All of this bots supported games."""
-    embed = discord.Embed(title='All the currently supported games on our platform', color=0xCC071F)
-    embed.add_field(name='\u200b',value='Rocket League: RL \n Roblox \n Minecraft: MC\n Valorant: Val \n Fortnite')
-    embed.set_footer(text='If a game your play isnt on here and you want it to be added try the TM!suggest command')
-    await ctx.respond(embed = embed)
+#@bot.command()
+#async def games(ctx):
+    #"""All of this bots supported games."""
+    #embed = discord.Embed(title='All the currently supported games on our platform', color=0xCC071F)
+    #embed.add_field(name='\u200b',value='Rocket League: RL \n Roblox \n Minecraft: MC\n Valorant: Val \n Fortnite')
+    #embed.set_footer(text='If a game your play isnt on here and you want it to be added try the TM!suggest command')
+    #await ctx.respond(embed = embed)
 
 @bot.command()
 @commands.max_concurrency(1,per=BucketType.user,wait=False)
@@ -445,7 +445,6 @@ async def search(ctx):
         z = profiling.find_one(info)
         if z == None:
             await ctx.respond('Error you didn\'t set up your profile. Please do `TM!setup` to do that.')
-        #jus to see sum
         else:
             embed = discord.Embed(title='What game are you trying to find a teammate for?',description='Make sure you have the game set up in your profile.',color=0xCC071F)
             await ctx.respond(embed = embed)
@@ -689,42 +688,55 @@ async def addgame(ctx,game:Option(str,"The game to setup with",required=True,cho
             if user != None:
                 await ctx.respond('Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
             else:
-                embed = discord.Embed(title='What is your Rocket League rank?',description='The ranks are from lowest to highest:** bronze, silver, gold, platinum, diamond, gc, ssl**',color=0xCC071F)
-                embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s',
-                                value='Please also just put your rank not tier.', inline=False)
+                embed = discord.Embed(title='What is your Rocket League rank?', color=0xCC071F)
+                embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s', value='\u200b', inline=False)
                 embed.add_field(
-                    name='When putting in your rank please be truthful for this is to help you find a teammate around your rank.',
+                    name='When putting in your rank please be **TRUTHFUL** for this is to help you find a teammate around your rank.',
                     value='if put in a False rank you account can be reported. Then can be blacklisted from our services.')
-                embed.set_footer(text='When saying your rank please do it as exactly as you see above.')
-                await ctx.respond(embed=embed)
-                button = Button(label="Bronze", style=discord.ButtonStyle.primary, custom_id='Bronze')
+                embed2 = discord.Embed(title='What is your Rocket League rank?', color=0xCC071F)
+                async def button_callback(interaction: discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2, view=None)
+                            embed = discord.Embed(title='Successfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            rl = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            RL.insert_one(rl)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Cancelled", embed=None, view=None)
+                button1 = Button(label="Bronze", style=discord.ButtonStyle.primary, custom_id='Bronze')
+                button2 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
+                button3 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
+                button4 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
+                button8 = Button(label="Diamond", style=discord.ButtonStyle.primary, custom_id='Diamond')
+                button5 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
+                button6 = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='GC')
+                button7 = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
+                cancel = Button(label="Cancel", style=discord.ButtonStyle.danger, custom_id="Cancel")
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                button4.callback = button_callback
+                button5.callback = button_callback
+                button6.callback = button_callback
+                button7.callback = button_callback
+                button8.callback = button_callback
+                cancel.callback = button_callback
                 view = View()
-                view.add_item(button)
-                button = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
-                view.add_item(button)
-                button = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
-                view.add_item(button)
-                button = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
-                view.add_item(button)
-                button = Button(label="Diamond", style=discord.ButtonStyle.primary, custom_id='Diamond')
-                view.add_item(button)
-                button = Button(label="Grand Champ", style=discord.ButtonStyle.primary, custom_id='Grand Champ')
-                view.add_item(button)
-                button = Button(label="SSL", style=discord.ButtonStyle.primary, custom_id='SSL')
-                view.add_item(button)
-
-                def check(message):
-                    return message.content in rank and (message.channel == ctx.channel) and (message.author == ctx.author)
-                try:
-                    answer = await bot.wait_for('message', timeout=30, check=check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('You didnt respond... Cancelling setup.')
-                else:
-                    answer = answer.content.lower()
-                    RL.insert_one({'user':ctx.author.id,'rank':f'{answer}'})
-                    embed = discord.Embed(title='Succesfully added Rocket League to your profile',color=0xCC071F)
-                    await ctx.respond(embed= embed)
-                    return
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(button4)
+                view.add_item(button8)
+                view.add_item(button5)
+                view.add_item(button6)
+                view.add_item(button7)
+                view.add_item(cancel)
+                await ctx.respond(embed=embed, view=view)
         elif game == 'Roblox':
             x = rbx.find_one({'user':ctx.author.id})
             if x != None:
@@ -740,9 +752,13 @@ async def addgame(ctx,game:Option(str,"The game to setup with",required=True,cho
                 except asyncio.TimeoutError:
                     await ctx.respond('You didnt respond... Cancelling setup.')
                 else:
-                    await ctx.respond('Successfully added to your profile.')
-                    rbx.insert_one({'user':ctx.author.id,'name':f'{answer.content}'})
-                    return
+                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
+                    profiling.insert_one(Profile)
+                    embed = discord.Embed(title='Succesfully set up your account',
+                                          description='If you want to find a partner right away then try my `TM!search` command.',
+                                          color=0xCC071F)
+                    await ctx.respond(embed=embed)
+                    rbx.insert_one({'user': ctx.author.id, 'name': f'{answer.content}'})
         elif game == 'Minecraft':
             x = MC.find_one({'user':ctx.author.id})
             if x != None:
@@ -877,173 +893,224 @@ async def addgame(ctx,game:Option(str,"The game to setup with",required=True,cho
                                 await ctx.respond(embed=embed)
                                 return
         elif game == 'Valorant':
-            embed = discord.Embed(title='What is your Valorant rank?',
-                                  description='The ranks are from lowest to highest:**bronze, iron, silver, gold, platinum, diamond, immortal, radiant**',
-                                  color=0xCC071F)
-            embed.add_field(name='Please be Truthful when inserting your rank.',
-                            value='If found and reported inserting a incorrect rank you can and will be blacklisted from our services.')
-            await ctx.respond(embed=embed)
-            rank = ['iron', 'bronze', 'silver', 'gold', 'platinum', 'diamond', 'immortal', 'radiant', 'Iron',
-                    'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant']
-
-            def check(message):
-                return message.content in rank and message.author == ctx.author and message.channel == ctx.channel
-
-            try:
-                rank = await bot.wait_for('message', timeout=45, check=check)
-            except asyncio.TimeoutError:
-                await ctx.respond('Error: You didnt respond in time... Cancelling setup.')
+            x = val.find_one({'user':ctx.author.id})
+            if x != None:
+                await ctx.respond('Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
             else:
-                rank = rank.content.lower()
-                embed = discord.Embed(title='Succesfully set up your account',
-                                      description='If you want to find a partner right away then try my `TM!search` command.',
+                embed = discord.Embed(title='What is your Valorant rank?',
+                                      description='The ranks are from lowest to highest:**bronze, iron, silver, gold, platinum, diamond, immortal, radiant**',
                                       color=0xCC071F)
-                val.insert_one({'user': ctx.author.id, 'rank': f'{rank}'})
-                await ctx.respond(embed=embed)
-                return
+                embed.add_field(name='Please be **TRUTHFUL** when inserting your rank.',
+                                value='If found and reported inserting a incorrect rank you can and will be blacklisted from our services.')
+                embed2 = discord.Embed(title='What is your Valorant rank?', color=0xCC071F)
 
+                async def button_callback(interaction: discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2, view=None)
+                            embed = discord.Embed(title='Successfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            VAL = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            val.insert_one(VAL)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Cancelled", embed=None, view=None)
+
+                button1 = Button(label="Iron", style=discord.ButtonStyle.primary, custom_id='Iron')
+                button2 = Button(label="Bronze", style=discord.ButtonStyle.primary, custom_id='Bronze')
+                button3 = Button(label="Silver", style=discord.ButtonStyle.primary, custom_id='Silver')
+                button4 = Button(label="Gold", style=discord.ButtonStyle.primary, custom_id='Gold')
+                button8 = Button(label="Platinum", style=discord.ButtonStyle.primary, custom_id='Platinum')
+                button5 = Button(label="Diamond", style=discord.ButtonStyle.primary, custom_id='Diamond')
+                button6 = Button(label="Immortal", style=discord.ButtonStyle.primary, custom_id='Immortal')
+                button7 = Button(label="Radiant", style=discord.ButtonStyle.primary, custom_id='Radiant')
+                cancel = Button(label="Cancel", style=discord.ButtonStyle.danger, custom_id="Cancel")
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                button4.callback = button_callback
+                button5.callback = button_callback
+                button6.callback = button_callback
+                button7.callback = button_callback
+                button8.callback = button_callback
+                cancel.callback = button_callback
+                view = View()
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(button4)
+                view.add_item(button8)
+                view.add_item(button5)
+                view.add_item(button6)
+                view.add_item(button7)
+                view.add_item(cancel)
+                await ctx.respond(embed=embed, view=view)
         elif game == 'Fortnite':
-            embed = discord.Embed(title='What League are you currently in?',
-                                  description='The leagues are from lowest to highest:**Open, Contender, Champion**',
-                                  color=0xCC071F)
-            await ctx.respond(embed=embed)
-            rank = ['open', 'Open', 'Contender', 'contender', 'Champion', 'champion']
-
-            def check(message):
-                return message.content in rank and message.channel == ctx.channel and message.author == ctx.author
-
-            try:
-                rank = await bot.wait_for('message', timeout=30, check=check)
-            except asyncio.TimeoutError:
-                await ctx.respond('Error: You didnt respond in time... Cancelling setup.')
+            x = fort.find_one({'user': ctx.author.id})
+            if x != None:
+                await ctx.respond(
+                    'Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
             else:
-                rank = rank.content.lower()
-                embed = discord.Embed(title='Succesfully set up your account',
-                                      description='If you want to find a partner right away then try my `TM!search` command.',
+                embed = discord.Embed(title='What league are you currently in?',
+                                      description='The leagues are from lowest to highest:**Open, Contender, Champion**',
                                       color=0xCC071F)
-                fort.insert_one({'user': ctx.author.id, 'rank': f'{rank}'})
-                await ctx.respond(embed=embed)
+                embed.add_field(name='Please be **TRUTHFUL** when inserting your league.',
+                                value='If found and reported inserting a incorrect league you can and will be blacklisted from our services.')
+                embed2 = discord.Embed(title='What is your Fortnite league?', color=0xCC071F)
 
+                # buttons for this too
+                async def button_callback(interaction: discord.Interaction):
+                    if interaction.user.id == ctx.author.id:
+                        if interaction.data.get('custom_id') != 'Cancel':
+                            rank = interaction.data.get('custom_id')
+                            embed2.add_field(name=f'You chose {rank}', value='\u200b')
+                            await interaction.response.edit_message(embed=embed2, view=None)
+                            embed = discord.Embed(title='Successfully set up your account',
+                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  color=0xCC071F)
+                            forts = {'user': ctx.author.id, 'rank': f'{rank}'}
+                            fort.insert_one(forts)
+                            await ctx.respond(embed=embed)
+                        else:
+                            await interaction.response.edit_message(content="Cancelled", embed=None, view=None)
 
+                button1 = Button(label="Open", style=discord.ButtonStyle.primary, custom_id='Open')
+                button2 = Button(label="Contender", style=discord.ButtonStyle.primary, custom_id='Contender')
+                button3 = Button(label="Champion", style=discord.ButtonStyle.primary, custom_id='Champion')
+                cancel = Button(label="Cancel", style=discord.ButtonStyle.danger, custom_id="Cancel")
+                button1.callback = button_callback
+                button2.callback = button_callback
+                button3.callback = button_callback
+                cancel.callback = button_callback
+                view = View()
+                view.add_item(button1)
+                view.add_item(button2)
+                view.add_item(button3)
+                view.add_item(cancel)
+                await ctx.respond(embed=embed, view=view)
 
-
-
-
-@bot.command(aliases =['Rgame'])
-async def removegame(ctx):
+@bot.slash_command(guild_ids=[877460893439512627])
+async def removegame(ctx,game:Option(str,"The game you want removed",required=True,choices=supported_games)):
     """Remove games from your personal profile."""
-    embed = discord.Embed(title='What game do you want to remove from your profile?',color=0xCC071F)
-    await ctx.respond(embed=embed)
-    abcd = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
-
-    def check(message):
-        return message.content in supported and message.author == ctx.author and message.channel == ctx.message.channel
-    try:
-        answer = await bot.wait_for('message', timeout=30, check=check)
-    except asyncio.TimeoutError:
-        await ctx.respond('You took to long... cancelling')
-    else:
-        if answer.content == 'RL' or answer.content == 'rl':
-            embed = discord.Embed(title='Are you sure you want to delete Rocket League from your profile?',color=0xCC071F)
-            await ctx.respond(embed = embed)
-            def check(message):
-                return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
-            try:
-                gotti = await bot.wait_for('message',timeout=30,check = check)
-            except:
-                await ctx.respond('You took to long... cancelling')
+    if game == 'Rocket League':
+        embed = discord.Embed(title='Are you sure you want to delete Rocket League from your profile?',
+                              color=0xCC071F)
+        async def button_callbacks(interaction: discord.Interaction):
+            if interaction.data.get('custom_id') != 'Cancel':
+                try:
+                    RL.delete_one({'user':ctx.author.id})
+                    await interaction.response.edit_message(embed=None,view=None,content="Successfully removed the game.")
+                except:
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="A problem occurred, please try again soon.")
             else:
-                if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-                    try:
-                        RL.delete_one({"user": ctx.author.id})
-                        await ctx.respond('succesfully deleted')
-                    except:
-                        await ctx.respond('Having trouble deleting the game. Please try again.')
-                elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-                    await ctx.respond('Ok, Not deleting Rocket League')
-        elif answer.content == 'Roblox' or answer.content == 'roblox':
-            embed = discord.Embed(title='Are you sure you want to delete Roblox from your profile?',
-                                  color=0xCC071F)
-            await ctx.respond(embed=embed)
-            def check(message):
-                return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
-            try:
-                gotti = await bot.wait_for('message', timeout=30, check=check)
-            except:
-                await ctx.respond('You took to long... cancelling')
+                await interaction.response.edit_message(embed=None,view=None,content="Cancelled")
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+        button1.callback = button_callbacks
+        cancel.callback = button_callbacks
+        view = View()
+        view.add_item(button1)
+        view.add_item(cancel)
+        await ctx.respond(embed=embed, view=view)
+    elif game == 'Roblox':
+        embed = discord.Embed(title='Are you sure you want to delete Roblox from your profile?',
+                              color=0xCC071F)
+        async def button_callbacks(interaction: discord.Interaction):
+            if interaction.data.get('custom_id') != 'Cancel':
+                try:
+                    rbx.delete_one({'user': ctx.author.id})
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="Successfully removed the game.")
+                except:
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="A problem occurred, please try again soon.")
             else:
-                if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-                    try:
-                        rbx.delete_one({"user": ctx.author.id})
-                        await ctx.respond('succesfully deleted')
-                    except:
-                        await ctx.respond('Having trouble deleting the game. Please try again.')
-                elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-                    await ctx.respond('Ok, Not deleting Roblox')
-        elif answer.content == 'MC' or answer.content == 'mc' or answer.content == 'Mc':
-            embed = discord.Embed(title='Are you sure you want to delete Minecraft from your profile?',
-                                  color=0xCC071F)
-            await ctx.respond(embed=embed)
+                await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
 
-            def check(message):
-                return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+        button1.callback = button_callbacks
+        cancel.callback = button_callbacks
+        view = View()
+        view.add_item(button1)
+        view.add_item(cancel)
+        await ctx.respond(embed=embed, view=view)
+    elif game == 'Minecraft':
+        embed = discord.Embed(title='Are you sure you want to delete Minecraft from your profile?',
+                              color=0xCC071F)
 
-            try:
-                gotti = await bot.wait_for('message', timeout=30, check=check)
-            except:
-                await ctx.respond('You took to long... cancelling')
+        async def button_callbacks(interaction: discord.Interaction):
+            if interaction.data.get('custom_id') != 'Cancel':
+                try:
+                    MC.delete_one({'user': ctx.author.id})
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="Successfully removed the game.")
+                except:
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="A problem occurred, please try again soon.")
             else:
-                if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-                    try:
-                        MC.delete_one({"user": ctx.author.id})
-                        await ctx.respond('succesfully deleted')
-                    except:
-                        await ctx.respond('Having trouble deleting the game. Please try again.')
-                elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-                    await ctx.respond('Ok, Not deleting Roblox')
-        elif answer.content == 'Val' or answer.content == 'val':
-            embed = discord.Embed(title='Are you sure you want to delete Valorant from your profile?',
-                                  color=0xCC071F)
-            await ctx.respond(embed=embed)
+                await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+        button1.callback = button_callbacks
+        cancel.callback = button_callbacks
+        view = View()
+        view.add_item(button1)
+        view.add_item(cancel)
+        await ctx.respond(embed=embed, view=view)
+    elif game == 'Valorant':
+        embed = discord.Embed(title='Are you sure you want to delete Valorant from your profile?',
+                              color=0xCC071F)
 
-            def check(message):
-                return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
-
-            try:
-                gotti = await bot.wait_for('message', timeout=30, check=check)
-            except:
-                await ctx.respond('You took to long... cancelling')
+        async def button_callbacks(interaction: discord.Interaction):
+            if interaction.data.get('custom_id') != 'Cancel':
+                try:
+                    RL.delete_one({'user': ctx.author.id})
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="Successfully removed the game.")
+                except:
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="A problem occurred, please try again soon.")
             else:
-                if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-                    try:
-                        val.delete_one({"user": ctx.author.id})
-                        await ctx.respond('succesfully deleted')
-                    except:
-                        await ctx.respond('Having trouble deleting the game. Please try again.')
-                elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-                    await ctx.respond('Ok, Not deleting Valorant')
-        elif answer.content == 'Fortnite' or answer.content == 'fortnite':
-            embed = discord.Embed(title='Are you sure you want to delete Fortnite from your profile?',
-                                  color=0xCC071F)
-            await ctx.respond(embed=embed)
+                await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
 
-            def check(message):
-                return message.content in abcd and message.author == ctx.author and message.channel == ctx.message.channel
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+        button1.callback = button_callbacks
+        cancel.callback = button_callbacks
+        view = View()
+        view.add_item(button1)
+        view.add_item(cancel)
+        await ctx.respond(embed=embed, view=view)
+    elif game == 'Fortnite':
+        embed = discord.Embed(title='Are you sure you want to delete Fortnite from your profile?',
+                              color=0xCC071F)
 
-            try:
-                gotti = await bot.wait_for('message', timeout=30, check=check)
-            except:
-                await ctx.respond('You took to long... cancelling')
+
+        async def button_callbacks(interaction: discord.Interaction):
+            if interaction.data.get('custom_id') != 'Cancel':
+                try:
+                    fort.delete_one({'user': ctx.author.id})
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="Successfully removed the game.")
+                except:
+                    await interaction.response.edit_message(embed=None, view=None,
+                                                            content="A problem occurred, please try again soon.")
             else:
-                if gotti.content == 'yes' or gotti.content == 'Yes' or gotti.content == 'y' or gotti.content == 'Y':
-                    try:
-                        fort.delete_one({"user": ctx.author.id})
-                        await ctx.respond('succesfully deleted')
-                    except:
-                        await ctx.respond('Having trouble deleting the game. Please try again.')
-                elif gotti.content == 'N' or gotti.content == 'No' or gotti.content == 'no' or gotti.content == 'n':
-                    await ctx.respond('Ok, Not deleting Valorant')
+                await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
 
+        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+        button1.callback = button_callbacks
+        cancel.callback = button_callbacks
+        view = View()
+        view.add_item(button1)
+        view.add_item(cancel)
+        await ctx.respond(embed=embed,view=view)
 @bot.command()
 async def suggest(ctx):
     """Suggest features and or games for the bot"""
@@ -1189,34 +1256,39 @@ async def profile(ctx,user:discord.User = None):
             embed.add_field(name='Fortnite',value=f'rank: {x.get("rank")}',inline=False)
         await ctx.respond(embed=embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def invite(ctx):
+    """Invite me to your server today!"""
     embed = discord.Embed(title='Invite TM to your server today!',description='[click here](https://discord.com/api/oauth2/authorize?client_id=822637954769879100&permissions=379905&scope=bot)',color=0xCC071F)
     await ctx.respond(embed = embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def tutorial(ctx):
+    """If you need help with Tilted Matchmaking"""
     embed = discord.Embed(title='Do you find TM a bit to hard to understand?',description='Then have a look at a very simple tutorial on how to setup your profile. You can find that video [here](https://youtu.be/dOZHazMxcag)',color=0xCC071F)
     await ctx.respond(embed = embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def help(ctx):
+    """The help section"""
     embed = discord.Embed(title='Tilted Matchmaking Help Section',description='All of TM\'s commands. If you need any assistance join our help server which you can find [here](https://discord.gg/rKWxkrCkUQ)',color=0xCC071F)
-    embed.add_field(name='Profile Commands',value='`TM!setup`\n`TM!profile`\n`TM!delprofile` \n`TM!addgame`\n`TM!removegame`',inline=False)
-    embed.add_field(name='Matchmaking Commands',value='`TM!search` \n`TM!cancel `',inline= False)
-    embed.add_field(name='Utilities',value='`TM!suggest`\n`TM!panel` \n`TM!report`\n`TM!games` \n`TM!invite`\n`TM!tutorial`',inline=False)
+    embed.add_field(name='Profile Commands',value='`/setup`\n`/profile`\n`/delprofile` \n`/addgame`\n`/removegame`',inline=False)
+    embed.add_field(name='Matchmaking Commands',value='`/search` \n`/cancel `',inline= False)
+    embed.add_field(name='Utilities',value='`/suggest`\n`/panel` \n`/report`\n`/games` \n`/invite`\n`/tutorial`',inline=False)
     embed.add_field(name='\u200b',value='Need help with TM but dont want to join the support server? check out the tutorial video thats on youtube. You can find it [here](https://youtu.be/dOZHazMxcag)')
     await ctx.respond(embed = embed)
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 async def vote(ctx):
+    """Vote for us!!!"""
     embed = discord.Embed(title='Vote for us on top.gg!',description='You can find the link [here.](https://top.gg/bot/822637954769879100/vote)',color=0xCC071F)
     await ctx.respond(embed = embed)
 
 
-@bot.command()
+@bot.slash_command(guild_ids=[877460893439512627])
 @commands.has_permissions(manage_channels=True)
 async def panel(ctx,channel:discord.TextChannel = None):
+    """Member setup panel, A ease of use feature to help your server members gain a profile."""
     if channel == None:
         channel = ctx.channel
     first = await ctx.respond(f"Sending A setup panel to <#{channel.id}>")
@@ -1226,8 +1298,7 @@ async def panel(ctx,channel:discord.TextChannel = None):
     emoji = bot.get_emoji(838234937743245382)
     await x.add_reaction(emoji)
     await asyncio.sleep(3)
-    await ctx.message.delete()
-    await first.delete()
+    await ctx.delete()
 
 
 @bot.event
