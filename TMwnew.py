@@ -29,7 +29,8 @@ fort = db.fortnite
 client = pymongo.MongoClient('mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE')
 db = client.server
 connected = db.matches
-supported_games = ["Rocket League","Roblox","Minecraft","Valorant","Fortnite"]
+#minecraft later
+supported_games = ["Rocket League","Roblox","Valorant","Fortnite"]
 intents = discord.Intents.all()
 
 
@@ -214,119 +215,119 @@ async def setup(ctx,game:Option(str,"The game to setup with",required=True,choic
                     await ctx.respond(embed = embed)
                     rbx.insert_one({'user':ctx.author.id,'name':f'{answer.content}'})
     #figure out how to find multiple options with MC and take options and take and respond. Try without message content input
-            elif game == 'Minecraft':
-                embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
-                await ctx.respond(embed=embed)
-                platform = ['Java','java','Bedrock','bedrock']
-                def check(message):
-                    return (message.content in platform) and (message.channel == ctx.channel) and (message.author == ctx.author)
-                try:
-                    platform = await bot.wait_for('message', timeout=30, check=check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('You didnt respond... Cancelling setup.')
-                else:
-                    platform = platform.content.lower()
-                    if platform == 'java':
-                        embed = discord.Embed(title='What gamemode do you wish to find a partner for.',description='Survival \n PVP: ex.Hypixel Network \n Modded: ex. FeedTheBeast minecraft modpacks',color=0xCC071F)
-                        embed.set_footer(text='To change this you are going to have to delete and readd this to your profile')
-                        await ctx.respond(embed = embed)
-                        gamemode = ['Survival','survival','PVP','pvp','Pvp','Modded','modded']
-                        def check(message):
-                            return (message.content in gamemode) and (message.channel == ctx.channel) and (message.author == ctx.author)
-                        try:
-                            mode = await bot.wait_for('message', timeout=30, check=check)
-                        except asyncio.TimeoutError:
-                            await ctx.respond('You didnt respond... Cancelling setup.')
-                        else:
-                            embed = discord.Embed(title='What is your IGN?',color=0xCC071F)
-                            await ctx.respond(embed = embed)
-                            def check(message):
-                                return(message.channel == ctx.channel) and (
-                                            message.author == ctx.author)
-                            try:
-                                IGN = await bot.wait_for('message', timeout=30, check=check)
-                            except asyncio.TimeoutError:
-                                await ctx.respond('You didnt respond... Cancelling setup.')
-                            else:
-                                IGN = IGN.content.lower()
-                                mode = mode.content.lower()
-                                if mode =='pvp':
-                                    embed = discord.Embed(title='What are your current stars. In Hypixel (the only current supported server)',description='Choose any pvp mod you want',color=0xCC071F)
-                                    await ctx.respond(embed = embed)
-                                    def check(message):
-                                        return (message.channel == ctx.channel) and (message.author == ctx.author)
-                                    try:
-                                        stars = await bot.wait_for('message',timeout=30,check=check)
-                                    except asyncio.TimeoutError:
-                                        await ctx.respond('You didnt respond... Cancelling setup.')
-                                    else:
-                                        Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                                        profiling.insert_one(Profile)
-                                        stars = int(stars.content)
-                                        embed = discord.Embed(title='Succesfully set up your account',
-                                                              description='If you want to find a partner right away then try my `TM!search` command.',
-                                                              color=0xCC071F)
-                                        info = {'user':ctx.author.id,'platform':f'{platform}','mode':'pvp','IGN':f'{IGN}','stars':stars}
-                                        MC.insert_one(info)
-                                        await ctx.respond(embed = embed)
-                                elif mode == 'survival':
-                                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                                    profiling.insert_one(Profile)
-                                    embed = discord.Embed(title='Succesfully set up your account',
-                                                              description='If you want to find a partner right away then try my `TM!search` command.',
-                                                              color=0xCC071F)
-                                    info = {'user':ctx.author.id,'platform':f'{platform}','mode':'survival','IGN':f'{IGN}'}
-                                    MC.insert_one(info)
-                                    await ctx.respond(embed = embed)
-
-                                elif mode == 'modded':
-                                    Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                                    profiling.insert_one(Profile)
-                                    embed = discord.Embed(title='Succesfully set up your account',
-                                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                                          color=0xCC071F)
-
-                                    info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'modded',
-                                            'IGN': f'{IGN}'}
-                                    MC.insert_one(info)
-                                    await ctx.respond(embed=embed)
-                    elif platform == 'bedrock':
-                        embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
-                                              description='Survival \n PVP: ex.Cubed Network',
-                                              color=0xCC071F)
-                        embed.set_footer(
-                            text='To change this you are going to have to delete and read this to your profile')
-                        await ctx.respond(embed=embed)
-                        gamemode = ['Survival', 'survival', 'PVP', 'pvp','Pvp']
-                        def check(message):
-                            return (message.content in gamemode) and (message.channel == ctx.channel) and (
-                                        message.author == ctx.author)
-                        try:
-                            mode = await bot.wait_for('message', timeout=30, check=check)
-                        except asyncio.TimeoutError:
-                            await ctx.respond('You didnt respond... Cancelling setup.')
-                        else:
-                            embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
-                            await ctx.respond(embed=embed)
-
-                            def check(message):
-                                return (message.channel == ctx.channel) and (
-                                        message.author == ctx.author)
-
-                            try:
-                                IGN = await bot.wait_for('message', timeout=30, check=check)
-                            except asyncio.TimeoutError:
-                                await ctx.respond('You didnt respond... Cancelling setup.')
-                            else:
-                                IGN = IGN.content.lower()
-                                mode = mode.content.lower()
-                                Profile = {'user': ctx.author.id, 'region': f'{region}'}
-                                profiling.insert_one(Profile)
-                                embed = discord.Embed(title='Succesfully set up your account',
-                                                      description='If you want to find a partner right away then try my `TM!search` command.',
-                                                      color=0xCC071F)
-                                MC.insert_one({'user':ctx.author.id,'platform':'bedrock','mode':f'{mode}','IGN':f'{IGN}'})
-                                await ctx.respond(embed = embed)
+            # elif game == 'Minecraft':
+            #     embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
+            #     await ctx.respond(embed=embed)
+            #     platform = ['Java','java','Bedrock','bedrock']
+            #     def check(message):
+            #         return (message.content in platform) and (message.channel == ctx.channel) and (message.author == ctx.author)
+            #     try:
+            #         platform = await bot.wait_for('message', timeout=30, check=check)
+            #     except asyncio.TimeoutError:
+            #         await ctx.respond('You didnt respond... Cancelling setup.')
+            #     else:
+            #         platform = platform.content.lower()
+            #         if platform == 'java':
+            #             embed = discord.Embed(title='What gamemode do you wish to find a partner for.',description='Survival \n PVP: ex.Hypixel Network \n Modded: ex. FeedTheBeast minecraft modpacks',color=0xCC071F)
+            #             embed.set_footer(text='To change this you are going to have to delete and readd this to your profile')
+            #             await ctx.respond(embed = embed)
+            #             gamemode = ['Survival','survival','PVP','pvp','Pvp','Modded','modded']
+            #             def check(message):
+            #                 return (message.content in gamemode) and (message.channel == ctx.channel) and (message.author == ctx.author)
+            #             try:
+            #                 mode = await bot.wait_for('message', timeout=30, check=check)
+            #             except asyncio.TimeoutError:
+            #                 await ctx.respond('You didnt respond... Cancelling setup.')
+            #             else:
+            #                 embed = discord.Embed(title='What is your IGN?',color=0xCC071F)
+            #                 await ctx.respond(embed = embed)
+            #                 def check(message):
+            #                     return(message.channel == ctx.channel) and (
+            #                                 message.author == ctx.author)
+            #                 try:
+            #                     IGN = await bot.wait_for('message', timeout=30, check=check)
+            #                 except asyncio.TimeoutError:
+            #                     await ctx.respond('You didnt respond... Cancelling setup.')
+            #                 else:
+            #                     IGN = IGN.content.lower()
+            #                     mode = mode.content.lower()
+            #                     if mode =='pvp':
+            #                         embed = discord.Embed(title='What are your current stars. In Hypixel (the only current supported server)',description='Choose any pvp mod you want',color=0xCC071F)
+            #                         await ctx.respond(embed = embed)
+            #                         def check(message):
+            #                             return (message.channel == ctx.channel) and (message.author == ctx.author)
+            #                         try:
+            #                             stars = await bot.wait_for('message',timeout=30,check=check)
+            #                         except asyncio.TimeoutError:
+            #                             await ctx.respond('You didnt respond... Cancelling setup.')
+            #                         else:
+            #                             Profile = {'user': ctx.author.id, 'region': f'{region}'}
+            #                             profiling.insert_one(Profile)
+            #                             stars = int(stars.content)
+            #                             embed = discord.Embed(title='Succesfully set up your account',
+            #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                                   color=0xCC071F)
+            #                             info = {'user':ctx.author.id,'platform':f'{platform}','mode':'pvp','IGN':f'{IGN}','stars':stars}
+            #                             MC.insert_one(info)
+            #                             await ctx.respond(embed = embed)
+            #                     elif mode == 'survival':
+            #                         Profile = {'user': ctx.author.id, 'region': f'{region}'}
+            #                         profiling.insert_one(Profile)
+            #                         embed = discord.Embed(title='Succesfully set up your account',
+            #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                                   color=0xCC071F)
+            #                         info = {'user':ctx.author.id,'platform':f'{platform}','mode':'survival','IGN':f'{IGN}'}
+            #                         MC.insert_one(info)
+            #                         await ctx.respond(embed = embed)
+            #
+            #                     elif mode == 'modded':
+            #                         Profile = {'user': ctx.author.id, 'region': f'{region}'}
+            #                         profiling.insert_one(Profile)
+            #                         embed = discord.Embed(title='Succesfully set up your account',
+            #                                               description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                               color=0xCC071F)
+            #
+            #                         info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'modded',
+            #                                 'IGN': f'{IGN}'}
+            #                         MC.insert_one(info)
+            #                         await ctx.respond(embed=embed)
+            #         elif platform == 'bedrock':
+            #             embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
+            #                                   description='Survival \n PVP: ex.Cubed Network',
+            #                                   color=0xCC071F)
+            #             embed.set_footer(
+            #                 text='To change this you are going to have to delete and read this to your profile')
+            #             await ctx.respond(embed=embed)
+            #             gamemode = ['Survival', 'survival', 'PVP', 'pvp','Pvp']
+            #             def check(message):
+            #                 return (message.content in gamemode) and (message.channel == ctx.channel) and (
+            #                             message.author == ctx.author)
+            #             try:
+            #                 mode = await bot.wait_for('message', timeout=30, check=check)
+            #             except asyncio.TimeoutError:
+            #                 await ctx.respond('You didnt respond... Cancelling setup.')
+            #             else:
+            #                 embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
+            #                 await ctx.respond(embed=embed)
+            #
+            #                 def check(message):
+            #                     return (message.channel == ctx.channel) and (
+            #                             message.author == ctx.author)
+            #
+            #                 try:
+            #                     IGN = await bot.wait_for('message', timeout=30, check=check)
+            #                 except asyncio.TimeoutError:
+            #                     await ctx.respond('You didnt respond... Cancelling setup.')
+            #                 else:
+            #                     IGN = IGN.content.lower()
+            #                     mode = mode.content.lower()
+            #                     Profile = {'user': ctx.author.id, 'region': f'{region}'}
+            #                     profiling.insert_one(Profile)
+            #                     embed = discord.Embed(title='Succesfully set up your account',
+            #                                           description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                           color=0xCC071F)
+            #                     MC.insert_one({'user':ctx.author.id,'platform':'bedrock','mode':f'{mode}','IGN':f'{IGN}'})
+            #                     await ctx.respond(embed = embed)
             elif game == 'Valorant':
                 embed = discord.Embed(title='What is your Valorant rank?',description='The ranks are from lowest to highest:**bronze, iron, silver, gold, platinum, diamond, immortal, radiant**',color=0xCC071F)
                 embed.add_field(name='Please be **TRUTHFUL** when inserting your rank.',value='If found and reported inserting a incorrect rank you can and will be blacklisted from our services.')
@@ -506,57 +507,57 @@ async def search(ctx,game:Option(str,"The game to search a partner for",required
                             info = {'user': ctx.author.id, 'game': "RBX", 'region': f"{z.get('region')}",
                                     'time': 0}
                             match.insert_one(info)
-            elif game == 'Minecraft':
-                if MC.find_one({'user':ctx.author.id}) == None:
-                    await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
-                else:
-                    embed = discord.Embed(title='Now Searching for teammates for the game: Minecraft',
-                                      description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
-                                      color=0xCC071F)
-                    await ctx.respond(embed = embed)
-                    yz = MC.find_one({'user':ctx.author.id})
-                    if yz.get('stars') != None:
-                        star = Profiles.MC_ranks(yz.get('stars'))
-                        info = {'game': 'MC', 'region': f"{z.get('region')}",
-                                'rank': f'{star}',
-                                'platform': f'{yz.get("platform")}'}
-                    else:
-                        info = {'game': 'MC', 'region': f"{z.get('region')}",
-                                'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}'}
-                    y = match.find(info)
-                    if y:
-                        y = dict(y)
-                    for info in y:
-                        id = info.get('user')
-                        user = bot.get_user(id)
-                    if not y:
-                        if yz.get('stars') != None:
-                            star = Profiles.MC_ranks(yz.get('stars'))
-                            info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}", 'rank': f'{star}',
-                                    'platform': f'{yz.get("platform")}','time':0}
-                        else:
-                            info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}",
-                                    'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
-                        match.insert_one(info)
-                    if user == None:
-                        return
-                    else:
-                        mel = await UserProfiles.teammateyes(ctx, user)
-                        if mel == False:
-                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                  color=0xCC071F)
-                            await user.send(embed=embed)
-                            match.delete_one({"user": user.id})
-                            if yz.get('stars') != None:
-                                star = Profiles.MC_ranks(yz.get('stars'))
-                                info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
-                                        'rank': f'{star}',
-                                        'platform': f'{yz.get("platform")}'}
-                            else:
-                                info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
-                                        'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
-                            match.insert_one(info)
+            # elif game == 'Minecraft':
+            #     if MC.find_one({'user':ctx.author.id}) == None:
+            #         await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
+            #     else:
+            #         embed = discord.Embed(title='Now Searching for teammates for the game: Minecraft',
+            #                           description='This lasts an hour at max, after an hour with no teammate found you will be DM\'ed to try again.',
+            #                           color=0xCC071F)
+            #         await ctx.respond(embed = embed)
+            #         yz = MC.find_one({'user':ctx.author.id})
+            #         if yz.get('stars') != None:
+            #             star = Profiles.MC_ranks(yz.get('stars'))
+            #             info = {'game': 'MC', 'region': f"{z.get('region')}",
+            #                     'rank': f'{star}',
+            #                     'platform': f'{yz.get("platform")}'}
+            #         else:
+            #             info = {'game': 'MC', 'region': f"{z.get('region')}",
+            #                     'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}'}
+            #         y = match.find(info)
+            #         if y:
+            #             y = dict(y)
+            #         for info in y:
+            #             id = info.get('user')
+            #             user = bot.get_user(id)
+            #         if not y:
+            #             if yz.get('stars') != None:
+            #                 star = Profiles.MC_ranks(yz.get('stars'))
+            #                 info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}", 'rank': f'{star}',
+            #                         'platform': f'{yz.get("platform")}','time':0}
+            #             else:
+            #                 info = {'user': ctx.author.id,'game': 'MC', 'region': f"{z.get('region')}",
+            #                         'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
+            #             match.insert_one(info)
+            #         if user == None:
+            #             return
+            #         else:
+            #             mel = await UserProfiles.teammateyes(ctx, user)
+            #             if mel == False:
+            #                 embed = discord.Embed(title='Alright. Removing you from the Queue.',
+            #                                       description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+            #                                       color=0xCC071F)
+            #                 await user.send(embed=embed)
+            #                 match.delete_one({"user": user.id})
+            #                 if yz.get('stars') != None:
+            #                     star = Profiles.MC_ranks(yz.get('stars'))
+            #                     info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
+            #                             'rank': f'{star}',
+            #                             'platform': f'{yz.get("platform")}'}
+            #                 else:
+            #                     info = {'user': ctx.author.id, 'game': 'MC', 'region': f"{z.get('region')}",
+            #                             'platform': f'{yz.get("platform")}', 'mode': f'{yz.get("mode")}','time':0}
+            #                 match.insert_one(info)
             elif game == 'Valorant':
                 if val.find_one({'user':ctx.author.id}) == None:
                     await ctx.respond('Error you have not setup this game in your profile. Please do so with `/addgame`.')
@@ -742,139 +743,139 @@ async def addgame(ctx,game:Option(str,"The game to setup with",required=True,cho
                                           color=0xCC071F)
                     await ctx.respond(embed=embed)
                     rbx.insert_one({'user': ctx.author.id, 'name': f'{answer.content}'})
-        elif game == 'Minecraft':
-            x = MC.find_one({'user':ctx.author.id})
-            if x != None:
-                await ctx.respond('Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
-            else:
-                embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
-                await ctx.respond(embed=embed)
-                platform = ['Java', 'java', 'Bedrock', 'bedrock']
-
-                def check(message):
-                    return (message.content in platform) and (message.channel == ctx.channel) and (
-                                message.author == ctx.author)
-
-                try:
-                    platform = await bot.wait_for('message', timeout=30, check=check)
-                except asyncio.TimeoutError:
-                    await ctx.respond('You didnt respond... Cancelling setup.')
-                else:
-                    platform = platform.content.lower()
-                    if platform == 'java':
-                        embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
-                                              description='Survival \n PVP: ex.Hypixel Network \n Modded: ex. FeedTheBeast minecraft modpacks',
-                                              color=0xCC071F)
-                        embed.set_footer(
-                            text='To change this you are going to have to delete and readd this to your profile')
-                        await ctx.respond(embed=embed)
-                        gamemode = ['Survival', 'survival', 'PVP', 'pvp', 'Pvp', 'Modded', 'modded']
-
-                        def check(message):
-                            return (message.content in gamemode) and (message.channel == ctx.channel) and (
-                                        message.author == ctx.author)
-
-                        try:
-                            mode = await bot.wait_for('message', timeout=30, check=check)
-                        except asyncio.TimeoutError:
-                            await ctx.respond('You didnt respond... Cancelling setup.')
-                        else:
-                            embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
-                            await ctx.respond(embed=embed)
-
-                            def check(message):
-                                return (message.channel == ctx.channel) and (
-                                        message.author == ctx.author)
-
-                            try:
-                                IGN = await bot.wait_for('message', timeout=30, check=check)
-                            except asyncio.TimeoutError:
-                                await ctx.respond('You didnt respond... Cancelling setup.')
-                            else:
-                                IGN = IGN.content.lower()
-                                mode = mode.content.lower()
-                                if mode == 'pvp':
-                                    embed = discord.Embed(
-                                        title='What are your current stars. In Hypixel (the only current supported server)',
-                                        description='Choose any pvp mod you want', color=0xCC071F)
-                                    await ctx.respond(embed=embed)
-
-                                    def check(message):
-                                        return (message.channel == ctx.channel) and (message.author == ctx.author)
-
-                                    try:
-                                        stars = await bot.wait_for('message', timeout=30, check=check)
-                                    except asyncio.TimeoutError:
-                                        await ctx.respond('You didnt respond... Cancelling setup.')
-                                    else:
-                                        stars = int(stars.content)
-                                        embed = discord.Embed(title='Succesfully set up your account',
-                                                              description='If you want to find a partner right away then try my `TM!search` command.',
-                                                              color=0xCC071F)
-                                        info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'pvp',
-                                                'IGN': f'{IGN}', 'stars': stars}
-                                        MC.insert_one(info)
-                                        await ctx.respond(embed=embed)
-                                elif mode == 'survival':
-                                    embed = discord.Embed(title='Succesfully set up your account',
-                                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                                          color=0xCC071F)
-
-                                    info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'survival',
-                                            'IGN': f'{IGN}'}
-                                    MC.insert_one(info)
-                                    await ctx.respond(embed=embed)
-
-
-                                elif mode == 'modded':
-                                    embed = discord.Embed(title='Succesfully set up your account',
-                                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                                          color=0xCC071F)
-
-                                    info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'modded',
-                                            'IGN': f'{IGN}'}
-                                    MC.insert_one(info)
-                                    await ctx.respond(embed=embed)
-                                    return
-                    elif platform == 'bedrock':
-                        embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
-                                              description='Survival \n PVP: ex.Cubed Network',
-                                              color=0xCC071F)
-                        embed.set_footer(
-                            text='To change this you are going to have to delete and readd this to your profile')
-                        await ctx.respond(embed=embed)
-                        gamemode = ['Survival', 'survival', 'PVP', 'pvp', 'Pvp']
-
-                        def check(message):
-                            return (message.content in gamemode) and (message.channel == ctx.channel) and (
-                                    message.author == ctx.author)
-
-                        try:
-                            mode = await bot.wait_for('message', timeout=30, check=check)
-                        except asyncio.TimeoutError:
-                            await ctx.respond('You didnt respond... Cancelling setup.')
-                        else:
-                            embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
-                            await ctx.respond(embed=embed)
-
-                            def check(message):
-                                return (message.channel == ctx.channel) and (
-                                        message.author == ctx.author)
-
-                            try:
-                                IGN = await bot.wait_for('message', timeout=30, check=check)
-                            except asyncio.TimeoutError:
-                                await ctx.respond('You didnt respond... Cancelling setup.')
-                            else:
-                                IGN = IGN.content.lower()
-                                mode = mode.content.lower()
-                                embed = discord.Embed(title='Succesfully set up your account',
-                                                      description='If you want to find a partner right away then try my `TM!search` command.',
-                                                      color=0xCC071F)
-                                MC.insert_one({'user': ctx.author.id, 'platform': 'bedrock', 'mode': f'{mode}',
-                                               'IGN': f'{IGN}'})
-                                await ctx.respond(embed=embed)
-                                return
+        # elif game == 'Minecraft':
+        #     x = MC.find_one({'user':ctx.author.id})
+        #     if x != None:
+        #         await ctx.respond('Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
+        #     else:
+        #         embed = discord.Embed(title='Do you play Minecraft Java or Bedrock?', color=0xCC071F)
+        #         await ctx.respond(embed=embed)
+        #         platform = ['Java', 'java', 'Bedrock', 'bedrock']
+        #
+        #         def check(message):
+        #             return (message.content in platform) and (message.channel == ctx.channel) and (
+        #                         message.author == ctx.author)
+        #
+        #         try:
+        #             platform = await bot.wait_for('message', timeout=30, check=check)
+        #         except asyncio.TimeoutError:
+        #             await ctx.respond('You didnt respond... Cancelling setup.')
+        #         else:
+        #             platform = platform.content.lower()
+        #             if platform == 'java':
+        #                 embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
+        #                                       description='Survival \n PVP: ex.Hypixel Network \n Modded: ex. FeedTheBeast minecraft modpacks',
+        #                                       color=0xCC071F)
+        #                 embed.set_footer(
+        #                     text='To change this you are going to have to delete and readd this to your profile')
+        #                 await ctx.respond(embed=embed)
+        #                 gamemode = ['Survival', 'survival', 'PVP', 'pvp', 'Pvp', 'Modded', 'modded']
+        #
+        #                 def check(message):
+        #                     return (message.content in gamemode) and (message.channel == ctx.channel) and (
+        #                                 message.author == ctx.author)
+        #
+        #                 try:
+        #                     mode = await bot.wait_for('message', timeout=30, check=check)
+        #                 except asyncio.TimeoutError:
+        #                     await ctx.respond('You didnt respond... Cancelling setup.')
+        #                 else:
+        #                     embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
+        #                     await ctx.respond(embed=embed)
+        #
+        #                     def check(message):
+        #                         return (message.channel == ctx.channel) and (
+        #                                 message.author == ctx.author)
+        #
+        #                     try:
+        #                         IGN = await bot.wait_for('message', timeout=30, check=check)
+        #                     except asyncio.TimeoutError:
+        #                         await ctx.respond('You didnt respond... Cancelling setup.')
+        #                     else:
+        #                         IGN = IGN.content.lower()
+        #                         mode = mode.content.lower()
+        #                         if mode == 'pvp':
+        #                             embed = discord.Embed(
+        #                                 title='What are your current stars. In Hypixel (the only current supported server)',
+        #                                 description='Choose any pvp mod you want', color=0xCC071F)
+        #                             await ctx.respond(embed=embed)
+        #
+        #                             def check(message):
+        #                                 return (message.channel == ctx.channel) and (message.author == ctx.author)
+        #
+        #                             try:
+        #                                 stars = await bot.wait_for('message', timeout=30, check=check)
+        #                             except asyncio.TimeoutError:
+        #                                 await ctx.respond('You didnt respond... Cancelling setup.')
+        #                             else:
+        #                                 stars = int(stars.content)
+        #                                 embed = discord.Embed(title='Succesfully set up your account',
+        #                                                       description='If you want to find a partner right away then try my `TM!search` command.',
+        #                                                       color=0xCC071F)
+        #                                 info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'pvp',
+        #                                         'IGN': f'{IGN}', 'stars': stars}
+        #                                 MC.insert_one(info)
+        #                                 await ctx.respond(embed=embed)
+        #                         elif mode == 'survival':
+        #                             embed = discord.Embed(title='Succesfully set up your account',
+        #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+        #                                                   color=0xCC071F)
+        #
+        #                             info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'survival',
+        #                                     'IGN': f'{IGN}'}
+        #                             MC.insert_one(info)
+        #                             await ctx.respond(embed=embed)
+        #
+        #
+        #                         elif mode == 'modded':
+        #                             embed = discord.Embed(title='Succesfully set up your account',
+        #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+        #                                                   color=0xCC071F)
+        #
+        #                             info = {'user': ctx.author.id, 'platform': f'{platform}', 'mode': 'modded',
+        #                                     'IGN': f'{IGN}'}
+        #                             MC.insert_one(info)
+        #                             await ctx.respond(embed=embed)
+        #                             return
+        #             elif platform == 'bedrock':
+        #                 embed = discord.Embed(title='What gamemode do you wish to find a partner for.',
+        #                                       description='Survival \n PVP: ex.Cubed Network',
+        #                                       color=0xCC071F)
+        #                 embed.set_footer(
+        #                     text='To change this you are going to have to delete and readd this to your profile')
+        #                 await ctx.respond(embed=embed)
+        #                 gamemode = ['Survival', 'survival', 'PVP', 'pvp', 'Pvp']
+        #
+        #                 def check(message):
+        #                     return (message.content in gamemode) and (message.channel == ctx.channel) and (
+        #                             message.author == ctx.author)
+        #
+        #                 try:
+        #                     mode = await bot.wait_for('message', timeout=30, check=check)
+        #                 except asyncio.TimeoutError:
+        #                     await ctx.respond('You didnt respond... Cancelling setup.')
+        #                 else:
+        #                     embed = discord.Embed(title='What is your IGN?', color=0xCC071F)
+        #                     await ctx.respond(embed=embed)
+        #
+        #                     def check(message):
+        #                         return (message.channel == ctx.channel) and (
+        #                                 message.author == ctx.author)
+        #
+        #                     try:
+        #                         IGN = await bot.wait_for('message', timeout=30, check=check)
+        #                     except asyncio.TimeoutError:
+        #                         await ctx.respond('You didnt respond... Cancelling setup.')
+        #                     else:
+        #                         IGN = IGN.content.lower()
+        #                         mode = mode.content.lower()
+        #                         embed = discord.Embed(title='Succesfully set up your account',
+        #                                               description='If you want to find a partner right away then try my `TM!search` command.',
+        #                                               color=0xCC071F)
+        #                         MC.insert_one({'user': ctx.author.id, 'platform': 'bedrock', 'mode': f'{mode}',
+        #                                        'IGN': f'{IGN}'})
+        #                         await ctx.respond(embed=embed)
+        #                         return
         elif game == 'Valorant':
             x = val.find_one({'user':ctx.author.id})
             if x != None:
