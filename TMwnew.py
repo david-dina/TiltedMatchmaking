@@ -75,15 +75,15 @@ async def on_member_join(member):
         return
     else:
         emoji = bot.get_emoji(838234937743245382)
-        embed = discord.Embed(title=f"{ctx.author.name}",
-                              description=f"It looks like {ctx.guild} is your first guild using {emoji} Tilted Matchmaking",
+        embed = discord.Embed(title=f"{user.name}",
+                              description=f"It looks like {member.guild} is your first guild using {emoji} Tilted Matchmaking",
                               color=0xCC071F)
         embed.set_author(icon_url=bot.user.avatar.url,
                          name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
-        embed.add_field(name='As a new server member you can claim these perks',
+        embed.add_field(name='__As a server member you can claim these features__',
                         value=" :art: Be able to create your own customizable profile :art:  \n :hammer: Add,Edit, and remove games from your gaming profile. :hammer: \n :people_holding_hands: Match with users discord-Wide to play your favorite games with a few clicks. :people_holding_hands:")
         embed.set_footer(text="Tilted Matchmaking. Find The Teammate of Your Dreams.")
-        await ctx.send(embed=embed)
+        await user.send(embed=embed)
 
 @bot.event
 async def on_ready():
