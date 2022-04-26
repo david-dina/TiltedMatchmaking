@@ -22,7 +22,7 @@ profiling = dbv3.User
 dbv4 = client.black
 BL = dbv4.list
 rbx = db.Roblox
-MC = db.MC
+#MC = db.MC
 val = db.valorant
 fort = db.fortnite
 #main email
@@ -70,6 +70,14 @@ async def on_member_join(member):
                             await channel.set_permissions(member, overwrite=perms)
                     except Exception as ex:
                         pass
+    user = bot.get_user(member.id)
+    if user.dm_channel:
+        return
+    else:
+        emoji = bot.get_emoji(838234937743245382)
+        embed = discord.Embed(title=f"{user.name}",description=f"It looks like {member.guild} is your first guild using {emoji} Tilted Matchmaking")
+        embed.set_author(icon_url=bot.user.avatar.url,name="[Tilted Matchmaking notification](https://discord.gg/rKWxkrCkUQ)")
+        await user.send(embed=embed)
 
 @bot.event
 async def on_ready():
@@ -79,7 +87,7 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx,error):
     if isinstance(error,commands.BotMissingPermissions):
-        await ctx.respond('Error: I am missing the permssions to operate properly. Please fix my permssions.')
+        await ctx.respond('Error: I am missing the permissions to operate properly. Please fix my permissions.')
     elif isinstance(error,commands.NoPrivateMessage):
         embed = discord.Embed(title='While running, an error occured.', description='This command doesnt work in dm\'s please try it in a guild.', color=0xCC071F)
         await ctx.respond(embed = embed)
@@ -1023,29 +1031,29 @@ async def removegame(ctx,game:Option(str,"The game you want removed",required=Tr
         view.add_item(button1)
         view.add_item(cancel)
         await ctx.respond(embed=embed, view=view)
-    elif game == 'Minecraft':
-        embed = discord.Embed(title='Are you sure you want to delete Minecraft from your profile?',
-                              color=0xCC071F)
-
-        async def button_callbacks(interaction: discord.Interaction):
-            if interaction.data.get('custom_id') != 'Cancel':
-                try:
-                    MC.delete_one({'user': ctx.author.id})
-                    await interaction.response.edit_message(embed=None, view=None,
-                                                            content="Successfully removed the game.")
-                except:
-                    await interaction.response.edit_message(embed=None, view=None,
-                                                            content="A problem occurred, please try again soon.")
-            else:
-                await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
-        button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
-        cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
-        button1.callback = button_callbacks
-        cancel.callback = button_callbacks
-        view = View()
-        view.add_item(button1)
-        view.add_item(cancel)
-        await ctx.respond(embed=embed, view=view)
+    # elif game == 'Minecraft':
+    #     embed = discord.Embed(title='Are you sure you want to delete Minecraft from your profile?',
+    #                           color=0xCC071F)
+    #
+    #     async def button_callbacks(interaction: discord.Interaction):
+    #         if interaction.data.get('custom_id') != 'Cancel':
+    #             try:
+    #                 MC.delete_one({'user': ctx.author.id})
+    #                 await interaction.response.edit_message(embed=None, view=None,
+    #                                                         content="Successfully removed the game.")
+    #             except:
+    #                 await interaction.response.edit_message(embed=None, view=None,
+    #                                                         content="A problem occurred, please try again soon.")
+    #         else:
+    #             await interaction.response.edit_message(embed=None, view=None, content="Cancelled")
+    #     button1 = Button(label="Yes", style=discord.ButtonStyle.danger, custom_id='Yes')
+    #     cancel = Button(label="No", style=discord.ButtonStyle.primary, custom_id="No")
+    #     button1.callback = button_callbacks
+    #     cancel.callback = button_callbacks
+    #     view = View()
+    #     view.add_item(button1)
+    #     view.add_item(cancel)
+    #     await ctx.respond(embed=embed, view=view)
     elif game == 'Valorant':
         embed = discord.Embed(title='Are you sure you want to delete Valorant from your profile?',
                               color=0xCC071F)
@@ -1235,9 +1243,9 @@ async def profile(ctx,user:discord.User = None):
         if x != None:
             embed.add_field(name='Roblox', value=f'Username: {x.get("name")}', inline=False)
         embed.set_thumbnail(url=user.avatar.url)
-        x = MC.find_one({'user':user.id})
-        if x != None:
-            embed.add_field(name='Minecraft',value=f'IGN: {x.get("IGN")} \n Platform: {x.get("platform")}', inline=False)
+        # x = MC.find_one({'user':user.id})
+        # if x != None:
+        #     embed.add_field(name='Minecraft',value=f'IGN: {x.get("IGN")} \n Platform: {x.get("platform")}', inline=False)
         x = val.find_one({'user':user.id})
         if x != None:
             embed.add_field(name='Valorant',value=f'rank: {x.get("rank")}',inline=False)
