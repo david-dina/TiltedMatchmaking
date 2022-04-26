@@ -75,8 +75,8 @@ async def on_member_join(member):
         return
     else:
         emoji = bot.get_emoji(838234937743245382)
-        embed = discord.Embed(title=f"{user.name}",
-                              description=f"It looks like {member.guild} is your first guild using {emoji} Tilted Matchmaking",
+        embed = discord.Embed(title=f"{user.name},",
+                              description=f"It looks like **{member.guild}** is your first guild using {emoji} Tilted Matchmaking",
                               color=0xCC071F)
         embed.set_author(icon_url=bot.user.avatar.url,
                          name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
