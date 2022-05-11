@@ -3,6 +3,9 @@ import discord
 from discord.ext import commands
 import asyncio
 from discord.ext.commands import Greedy
+from discord import SelectOption
+from discord.ext import commands,tasks
+from discord.ui import Button,View
 #chenpickle
 client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE",connect=False)
 db = client.games
@@ -73,13 +76,34 @@ class UserProfiles:
     def __init__(self,bot):
         self.bot = bot
 
-
     async def location(self,user:discord.User,channel: Greedy[int] = None):
         if channel == None:
             ctx = user
         else:
             ctx = self.bot.get_channel(channel)
-        region = ['NA', 'na', 'EU', 'eu', 'SA', 'sa', 'Asia', 'asia', 'Australia', 'australia']
+        async def button_callback(interaction: discord.Interaction):
+            if interaction.user.id == ctx.user.id:
+                if interaction.data.get('custom_id') != 'Cancel':
+                    region = interaction.data.get('custom_id')
+                    Profile = {'user': ctx.user.id, 'region': f'{region}'}
+                    profiling.insert_one(Profile)
+        button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
+        button2 = Button(label="Europe", style=discord.ButtonStyle.primary, custom_id='eu')
+        button3 = Button(label="South America", style=discord.ButtonStyle.primary, custom_id='sa')
+        button4 = Button(label="Asia", style=discord.ButtonStyle.primary, custom_id='asia')
+        button5 = Button(label="Australia", style=discord.ButtonStyle.primary, custom_id='australia')
+        button1.callback = button_callback
+        button2.callback = button_callback
+        button3.callback = button_callback
+        button4.callback = button_callback
+        button5.callback = button_callback
+        view = View()
+        view.add_item(button1)
+        view.add_item(button2)
+        view.add_item(button3)
+        view.add_item(button4)
+        view.add_item(button5)
+
         embed = discord.Embed(title='Where are you from?',
                               description='We need this information in order to find people who are nearest to you. so you wont have to worry about latency.(for games that require it.)',
                               color=0xCC071F)
@@ -87,36 +111,7 @@ class UserProfiles:
                         value='North America: NA \n South America: SA \n Europe: EU \n Asia \n Australia')
         embed.set_footer(
             text='If there is a location that is not currently supported that you would like Suggest it using TM!suggest.')
-        await ctx.send(embed=embed)
-        try:
-            x = self.bot.get_channel(channel)
-        except:
-            x = None
-            pass
-        if x == None:
-            def check(message):
-                return message.content in region and message.author == user
-        else:
-            def check(message):
-                return message.content in region and message.author == user and message.channel == ctx.channel
-        if isinstance(self,commands.Bot):
-            try:
-                location = await self.wait_for('message', timeout=30, check=check)
-            except asyncio.TimeoutError:
-                await ctx.send('You didnt respond... Cancelling setup.')
-            else:
-                location = location.content.lower()
-                Profile = {'user': user.id, 'region': f'{location}'}
-                profiling.insert_one(Profile)
-        else:
-            try:
-                location = await self.bot.wait_for('message', timeout=30, check=check)
-            except asyncio.TimeoutError:
-                await ctx.send('You didnt respond... Cancelling setup.')
-            else:
-                location = location.content.lower()
-                Profile = {'user': user.id, 'region': f'{location}'}
-                profiling.insert_one(Profile)
+        await ctx.send(embed=embed,view=view)
 
 
 
