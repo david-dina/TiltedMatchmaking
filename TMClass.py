@@ -86,6 +86,8 @@ class UserProfiles:
                 if interaction.data.get('custom_id') != 'Cancel':
                     region = interaction.data.get('custom_id')
                     Profile = {'user': user.id, 'region': f'{region}'}
+                    if profiling.find_one(Profile):
+                        return
                     profiling.insert_one(Profile)
                     embed = discord.Embed(title='Successfully set up your account',
                                           description='If you want to find a partner right away then try my `TM!search` command.',
