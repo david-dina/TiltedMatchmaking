@@ -76,17 +76,21 @@ class UserProfiles:
     def __init__(self,bot):
         self.bot = bot
 
-    async def location(self,user:discord.User,channel: Greedy[int] = None):
+    async def location(self,user:discord.User,channel: Greedy[int] = None) -> None:
         if channel == None:
             ctx = user
         else:
             ctx = self.bot.get_channel(channel)
         async def button_callback(interaction: discord.Interaction):
-            if interaction.user.id == ctx.user.id:
+            if interaction.user.id == user.id:
                 if interaction.data.get('custom_id') != 'Cancel':
                     region = interaction.data.get('custom_id')
-                    Profile = {'user': ctx.user.id, 'region': f'{region}'}
+                    Profile = {'user': user.id, 'region': f'{region}'}
                     profiling.insert_one(Profile)
+                    embed = discord.Embed(title='Successfully set up your account',
+                                          description='If you want to find a partner right away then try my `TM!search` command.',
+                                          color=0xCC071F)
+                    await interaction.response.send_message(embed=embed)
         button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
         button2 = Button(label="Europe", style=discord.ButtonStyle.primary, custom_id='eu')
         button3 = Button(label="South America", style=discord.ButtonStyle.primary, custom_id='sa')
