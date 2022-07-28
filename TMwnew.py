@@ -1,5 +1,6 @@
 # Same as TM.py but integrated with discord.py package 2.0 integrating bot attribute class "tree"
 import discord
+import asyncio
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 from discord import app_commands
@@ -1529,5 +1530,9 @@ async def on_raw_reaction_add(payload):
                     await user.send(
                         'Error you already have your profile setup. If you wish to add more games try the `/addgame` command.')
 
+async def main():
+   async with client:
+       await update.start()
+       await bot.start('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
 
-bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
+asyncio.run(main())
