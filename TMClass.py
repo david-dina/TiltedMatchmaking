@@ -1,9 +1,7 @@
 import pymongo
 import discord
-from discord.ext import commands
-import asyncio
 from discord.ext.commands import Greedy
-from discord import SelectOption
+from discord import Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
 #chenpickle
@@ -29,19 +27,19 @@ connected = db.matches
 
 class Profiles:
 
-    def rocket(self,user):
+    def rocket(self,user) -> dict:
         playa = RL.find_one({'user': user})
         return playa
 
-    def profiles(self,user):
+    def profiles(self,user) -> dict:
         playa = profiling.find_one({'user': user})
         return playa
 
-    def blacklisted(self,user):
+    def blacklisted(self,user) -> dict:
         x = BL.find_one({'user': user})
         return x
 
-    def MC_ranks(self,lvl: int):
+    def MC_ranks(self,lvl: int) -> str:
         if lvl <= 100:
             return 'stone'
         else:
@@ -63,7 +61,7 @@ class Profiles:
                                 if lvl > 600:
                                     return 'godly'
 
-    def deletion(self,user):
+    def deletion(self,user) -> None:
         RL.delete_one({'user': user})
         match.delete_one({'user': user})
         profiling.delete_one({'user': user})
@@ -89,6 +87,7 @@ class UserProfiles:
                     if profiling.find_one(Profile):
                         return
                     profiling.insert_one(Profile)
+                    await interaction.delete_original_message()
                     embed = discord.Embed(title='Successfully set up your account',
                                           description='If you want to find a partner right away then try my `TM!search` command.',
                                           color=0xCC071F)
@@ -103,7 +102,7 @@ class UserProfiles:
         button3.callback = button_callback
         button4.callback = button_callback
         button5.callback = button_callback
-        view = View()
+        view = View(timeout=300)
         view.add_item(button1)
         view.add_item(button2)
         view.add_item(button3)
@@ -122,16 +121,31 @@ class UserProfiles:
 
 
     async def teammateyes(self,ctx,user) -> bool:
-        embed = discord.Embed(title=f'Succesfully found you a teammate. His name is {ctx.author.name}',
-                              description=f'Inviting you to their server which is: {ctx.guild.name}.',
-                              color=0xCC071F)
-        embed.add_field(name='Are you ready to be invited?',
-                        value='Yes or No?: if no your spot in the queue will be deleted.')
+        print('here')
+        embed = Embed(title=f'Succesfully found you a teammate. His name is {ctx.author.name}',description=f'Inviting to the Official Tilted Matchmaking server for interaction.',color=0xCC071F)
+        embed.add_field(name='Are you ready to be invited?',value='if no your spot in the queue will be deleted.')
+        print('pause')
         await user.send(embed=embed)
-        namesters = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
+        print('sending to user')
 
+        async def button_callback(interaction: discord.Interaction):
+            if interaction.user.id == user.id:
+                if interaction.data.get('custom_id') != 'No':
+                    region = interaction.data.get('custom_id')
+                    Profile = {'user': user.id, 'region': f'{region}'}
+                    if profiling.find_one(Profile):
+                        return
+                    profiling.insert_one(Profile)
+                    embed = discord.Embed(title='Successfully set up your account',
+                                          description='If you want to find a partner right away then try my `TM!search` command.',
+                                          color=0xCC071F)
+                    await interaction.response.send_message(embed=embed)
+
+        button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
+        button2 = Button(label="Europe", style=discord.ButtonStyle.primary, custom_id='eu')
+        namesters = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
         def check(message):
-            return message.content in namesters and message.author == user
+            return message.content in namesters and message.user == user
         gottem = await ctx.bot.wait_for('message', timeout=120, check=check)
         if gottem.content == 'yes' or gottem.content == 'Yes' or gottem.content == 'y' or gottem.content == 'Y':
             await user.send(f'Ok, getting you your invite. Remember to look out for {ctx.author.mention}')
