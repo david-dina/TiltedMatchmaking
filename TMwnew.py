@@ -554,7 +554,7 @@ async def setup_error(ctx, error):
 @bot.tree.command()
 @app_commands.choices(game=supported_games)
 @commands.max_concurrency(1, per=BucketType.user, wait=False)
-@commands.guild_only()
+@app_commands.guild_only()
 async def search(ctx: discord.Interaction, game: str):
     """Search for a teammate."""
     await ctx.response.defer()
@@ -1531,8 +1531,9 @@ async def on_raw_reaction_add(payload):
                         'Error you already have your profile setup. If you wish to add more games try the `/addgame` command.')
 
 async def main():
-   async with client:
-       await update.start()
-       await bot.start('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
+    async with bot:
+        await bot.start('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
+        await update.start()
+
 
 asyncio.run(main())
