@@ -1516,5 +1516,5 @@ async def on_raw_reaction_add(payload):
                     await user.send(
                         'Error you already have your profile setup. If you wish to add more games try the `/addgame` command.')
 
-update.start()
+
 bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')

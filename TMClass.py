@@ -1,7 +1,7 @@
 import pymongo
 import discord
 from discord.ext.commands import Greedy
-from discord import Embed
+from discord import Embed as Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
 #chenpickle
@@ -121,24 +121,13 @@ class UserProfiles:
 
 
     async def teammateyes(self,ctx,user) -> bool:
-        print('here')
-        embed = Embed(title=f'Succesfully found you a teammate. His name is {ctx.author.name}',description=f'Inviting to the Official Tilted Matchmaking server for interaction.',color=0xCC071F)
+        embed = Embed(title=f'Succesfully found you a teammate. His name is {ctx.user.name}',description=f'Inviting to the Official Tilted Matchmaking server for interaction.',color=0xCC071F)
         embed.add_field(name='Are you ready to be invited?',value='if no your spot in the queue will be deleted.')
-        print('pause')
         await user.send(embed=embed)
-        print('sending to user')
-
         async def button_callback(interaction: discord.Interaction):
             if interaction.user.id == user.id:
                 if interaction.data.get('custom_id') != 'No':
-                    region = interaction.data.get('custom_id')
-                    Profile = {'user': user.id, 'region': f'{region}'}
-                    if profiling.find_one(Profile):
-                        return
-                    profiling.insert_one(Profile)
-                    embed = discord.Embed(title='Successfully set up your account',
-                                          description='If you want to find a partner right away then try my `TM!search` command.',
-                                          color=0xCC071F)
+                    #if said no go into database and take user out of it.
                     await interaction.response.send_message(embed=embed)
 
         button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
@@ -199,7 +188,7 @@ class UserProfiles:
             embed = discord.Embed(title='A Match was successfully made', color=0xCC071F)
             embed.add_field(name='The couple in question:', value=f'{ctx.author} and {user}', inline=False)
             embed.add_field(name='The guild:', value=f'{ctx.guild.name} [here]({x})')
-            channel = self.bot.get_channel(826334789169578015)
+            channel = self.bot.get_channel(1002096611108851794)
             await channel.send(embed=embed)
             return True
         elif gottem.content == 'N' or gottem.content == 'No' or gottem.content == 'no' or gottem.content == 'n':
