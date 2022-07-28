@@ -9,7 +9,7 @@ client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9
 db = client.games
 RL = db.RocketLeague
 dbv2 = client.Match
-match = dbv2.Maker
+match = dbv2.maker
 dbv3 = client.Profile
 profiling = dbv3.User
 dbv4 = client.black
@@ -70,6 +70,34 @@ class Profiles:
         val.delete_one({'user':user})
         fort.delete_one({'user':user})
 
+class MyView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.answer = None
+    async def on_timeout(self) -> None:
+        for item in self.children:
+            item.disabled = True
+        self.answer = 'No'
+        #await self.message.edit(view=self)
+
+
+    @discord.ui.button(label='Yes',style=discord.ButtonStyle.green)
+    async def yes_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Ok, getting you your invite!')
+        await self.on_timeout()
+        self.answer = 'Yes'
+        self.stop()
+
+    @discord.ui.button(label='No', style=discord.ButtonStyle.danger)
+    async def no_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                              description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                              color=0xCC071F)
+        await interaction.response.send_message(embed=embed)
+        self.answer = 'No'
+        self.stop()
+
+
 class UserProfiles:
     def __init__(self,bot):
         self.bot = bot
@@ -120,39 +148,33 @@ class UserProfiles:
 
 
 
-    async def teammateyes(self,ctx,user) -> bool:
+    async def teammateyes(self,ctx,user:discord.User) -> bool:
         embed = Embed(title=f'Succesfully found you a teammate. His name is {ctx.user.name}',description=f'Inviting to the Official Tilted Matchmaking server for interaction.',color=0xCC071F)
         embed.add_field(name='Are you ready to be invited?',value='if no your spot in the queue will be deleted.')
-        await user.send(embed=embed)
-        async def button_callback(interaction: discord.Interaction):
-            if interaction.user.id == user.id:
-                if interaction.data.get('custom_id') != 'No':
-                    #if said no go into database and take user out of it.
-                    await interaction.response.send_message(embed=embed)
-        #timeout=300
-        button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
-        button2 = Button(label="Europe", style=discord.ButtonStyle.primary, custom_id='eu')
-        namesters = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
-        def check(message):
-            return message.content in namesters and message.user == user
-        gottem = await ctx.bot.wait_for('message', timeout=120, check=check)
-        if gottem.content == 'yes' or gottem.content == 'Yes' or gottem.content == 'y' or gottem.content == 'Y':
-            await user.send(f'Ok, getting you your invite. Remember to look out for {ctx.author.mention}')
+        view=MyView()
+        response = await user.send(embed=embed,view=view)
+        await view.wait()
+        await response.edit(view=None)
+        if view.answer == 'Yes':
+            await user.send(f'Remember to look out for {ctx.user.name}|<@{ctx.user.id}>')
             embed = discord.Embed(title=f'Successfully found you a teammate. His name is {user.name}',
                                   description=f'Inviting you both to the TM Matchmaking server.',
                                   color=0xCC071F)
-            await ctx.author.send(embed=embed)
-            #guild = ctx.bot.get_guild(864014262234251304)
-            #category = discord.utils.get(guild.categories, id=864014262234251307)
-            #channel = ctx.bot.get_channel(864015076552998933)
-            #x = await channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
-            x = ctx.channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
+            await ctx.user.send(embed=embed)
+            guild = self.bot.get_guild(1001879078569246790)
+            category = [category for category in guild.categories if category.name =='Texts' or category.name == 'Voice']
+            for i in category:
+                if i.name=="Texts":await i.create_text_channel(name=f'{ctx.user.id}+{user.id}')
+                else:await i.create_voice_channel(name=f"{user.id}+{ctx.user.id}")
+            channel = self.bot.get_channel(1001879079399739434)
+            x = await channel.create_invite(reason='Successful Match Made.', max_age=3600, max_uses=5)
+            #x = ctx.channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
 
             await user.send(f'{x}')
-            await ctx.author.send(f'Here is your invite: {x}')
-            await ctx.author.send(f'Remember to look out for {user.mention}')
+            await ctx.user.send(f'Here is your invite: {x}')
+            await ctx.user.send(f'Remember to look out for {user.mention}')
             match.delete_one({"user": user.id})
-            match.delete_one({"user": ctx.author.id})
+            match.delete_one({"user": ctx.user.id})
             # overwritestxt = {
             #     guild.default_role: discord.PermissionOverwrite(read_messages=False)
             # }
@@ -183,13 +205,12 @@ class UserProfiles:
             #     connected.insert_one({f'{user.id}':f'{ctx.author.id}'})
             #except Exception as e:
             #    print(e)
-            await ctx.author.send('Thank you for using our services.')
+            await ctx.user.send('Thank you for using our services.')
             await user.send('Thank you for using our services.')
-            embed = discord.Embed(title='A Match was successfully made', color=0xCC071F)
-            embed.add_field(name='The couple in question:', value=f'{ctx.author} and {user}', inline=False)
-            embed.add_field(name='The guild:', value=f'{ctx.guild.name} [here]({x})')
+            embed = Embed(title='A Match was successfully made', color=0xCC071F)
+            embed.add_field(name='The users in question:', value=f'{ctx.user} and {user}', inline=False)
             channel = self.bot.get_channel(1002096611108851794)
             await channel.send(embed=embed)
             return True
-        elif gottem.content == 'N' or gottem.content == 'No' or gottem.content == 'no' or gottem.content == 'n':
+        else:
             return False
