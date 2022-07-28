@@ -1474,6 +1474,11 @@ async def vote(ctx: discord.Interaction):
                           color=0xCC071F)
     await ctx.response.send_message(embed=embed)
 
+@bot.tree.command(name='support')
+async def support(ctx:discord.Interaction):
+    """Invite to the Support Server"""
+    await ctx.response.send_message('https://discord.gg/rKWxkrCkUQ')
+
 
 @bot.tree.command(name='panel')
 @commands.has_permissions(manage_channels=True)
