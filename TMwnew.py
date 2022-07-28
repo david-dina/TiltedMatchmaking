@@ -52,7 +52,7 @@ Reaction = Reaction(bot)
 
 @bot.event
 async def on_command(ctx):
-    channel = bot.get_channel(827601440666288139)
+    channel = bot.get_channel(1002096611108851794)
     await channel.send(f'`{ctx.command}` was used')
 
 @bot.event
@@ -379,7 +379,7 @@ async def setup(ctx: discord.Interaction, game: str):
             #                             profiling.insert_one(Profile)
             #                             stars = int(stars.content)
             #                             embed = discord.Embed(title='Succesfully set up your account',
-            #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                                   description='If you want to find a partner right away then try my `/search` command.',
             #                                                   color=0xCC071F)
             #                             info = {'user':ctx.user.id,'platform':f'{platform}','mode':'pvp','IGN':f'{IGN}','stars':stars}
             #                             MC.insert_one(info)
@@ -388,7 +388,7 @@ async def setup(ctx: discord.Interaction, game: str):
             #                         Profile = {'user': ctx.user.id, 'region': f'{region}'}
             #                         profiling.insert_one(Profile)
             #                         embed = discord.Embed(title='Succesfully set up your account',
-            #                                                   description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                                   description='If you want to find a partner right away then try my `/search` command.',
             #                                                   color=0xCC071F)
             #                         info = {'user':ctx.user.id,'platform':f'{platform}','mode':'survival','IGN':f'{IGN}'}
             #                         MC.insert_one(info)
@@ -398,7 +398,7 @@ async def setup(ctx: discord.Interaction, game: str):
             #                         Profile = {'user': ctx.user.id, 'region': f'{region}'}
             #                         profiling.insert_one(Profile)
             #                         embed = discord.Embed(title='Succesfully set up your account',
-            #                                               description='If you want to find a partner right away then try my `TM!search` command.',
+            #                                               description='If you want to find a partner right away then try my `/search` command.',
             #                                               color=0xCC071F)
             #
             #                         info = {'user': ctx.user.id, 'platform': f'{platform}', 'mode': 'modded',
@@ -572,30 +572,24 @@ async def search(ctx: discord.Interaction, game: str):
                                       color=0xCC071F)
                 await ctx.followup.send(embed=embed)
                 info = {'game': 'RL', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                y = match.find(info)
-                if y:
-                    y = dict(y)
-                for info in y:
-                    id = info.get('user')
-                    user = bot.get_user(id)
+                y = match.find(info)[0]
                 if not y:
                     info = {'game': 'RL', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
                             'region': f"{z.get('region')}", 'time': 0}
                     match.insert_one(info)
-                if user == None:
                     return
-                else:
-                    mel = await UserProfiles.teammateyes(ctx, user)
-                    if mel == False:
-                        embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                              description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                              color=0xCC071F)
-                        await user.send(embed=embed)
-                        match.delete_one({"user": user.id})
-                        info = {'game': 'RL', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
-                                'region': f"{z.get('region')}", 'time': 0}
-                        match.insert_one(info)
-
+                id = y.get('user')
+                user = bot.get_user(id)
+                mel = await UserProfiles.teammateyes(ctx, user)
+                if mel == False:
+                    embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                                          description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                                          color=0xCC071F)
+                    await user.send(embed=embed)
+                    match.delete_one({"user": user.id})
+                    info = {'game': 'RL', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
+                            'region': f"{z.get('region')}", 'time': 0}
+                    match.insert_one(info)
 
             elif game == 'Roblox':
                 if rbx.find_one({'user': ctx.user.id}) == None:
@@ -1522,5 +1516,5 @@ async def on_raw_reaction_add(payload):
                     await user.send(
                         'Error you already have your profile setup. If you wish to add more games try the `/addgame` command.')
 
-
+update.start()
 bot.run('ODIyNjM3OTU0NzY5ODc5MTAw.YFVLTA.ynYbEzL4witqVPnDOZPpbYLRUgE')
