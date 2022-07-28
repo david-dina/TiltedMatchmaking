@@ -4,6 +4,7 @@ from discord.ext.commands import Greedy
 from discord import Embed as Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
+import requests
 #chenpickle
 client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE",connect=False)
 db = client.games
@@ -96,6 +97,17 @@ class MyView(discord.ui.View):
         await interaction.response.send_message(embed=embed)
         self.answer = 'No'
         self.stop()
+
+class Requesting:
+    def __init__(self):
+        self.URL = "https://random-word-api.herokuapp.com/word?lang=es&number=1"
+
+    def get_word(self):
+        return self._send_request()
+
+    def _send_request(self):
+        r = requests.get(url=self.URL)
+        return r
 
 
 class UserProfiles:
