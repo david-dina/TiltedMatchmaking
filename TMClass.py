@@ -102,7 +102,7 @@ class UserProfiles:
         button3.callback = button_callback
         button4.callback = button_callback
         button5.callback = button_callback
-        view = View(timeout=300)
+        view = View()
         view.add_item(button1)
         view.add_item(button2)
         view.add_item(button3)
@@ -129,7 +129,7 @@ class UserProfiles:
                 if interaction.data.get('custom_id') != 'No':
                     #if said no go into database and take user out of it.
                     await interaction.response.send_message(embed=embed)
-
+        #timeout=300
         button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
         button2 = Button(label="Europe", style=discord.ButtonStyle.primary, custom_id='eu')
         namesters = ['Yes', 'yes', 'y', 'Y', 'No', 'no', 'n', 'N']
