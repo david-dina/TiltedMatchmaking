@@ -12,11 +12,11 @@ from TMclassv2 import Reaction
 
 # chen email
 client = pymongo.MongoClient(
-    "mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+    "mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/?retryWrites=true&w=majority")
 db = client.games
 RL = db.RocketLeague
 dbv2 = client.Match
-match = dbv2.Maker
+match = dbv2.maker
 dbv3 = client.Profile
 profiling = dbv3.User
 dbv4 = client.black
@@ -27,7 +27,7 @@ val = db.valorant
 fort = db.fortnite
 # main email
 client = pymongo.MongoClient(
-    'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE')
+    'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
 db = client.server
 connected = db.matches
 # minecraft later
@@ -572,7 +572,11 @@ async def search(ctx: discord.Interaction, game: str):
                                       color=0xCC071F)
                 await ctx.followup.send(embed=embed)
                 info = {'game': 'RL', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                y = match.find(info)[0]
+                count = match.count_documents(info)
+                if count == 0:
+                    y = None
+                else:
+                    y = match.find(info)[0]
                 if not y:
                     info = {'game': 'RL', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
                             'region': f"{z.get('region')}", 'time': 0}
@@ -814,7 +818,7 @@ async def addgame(ctx: discord.Interaction,game: str):  # "Rocket League", "Robl
                             embed2.add_field(name=f'You chose {rank}', value='\u200b')
                             await interaction.response.edit_message(embed=embed2, view=None)
                             embed = discord.Embed(title='Successfully set up your account',
-                                                  description='If you want to find a partner right away then try my `TM!search` command.',
+                                                  description='If you want to find a partner right away then try my `/search` command.',
                                                   color=0xCC071F)
                             rl = {'user': ctx.user.id, 'rank': f'{rank}'}
                             RL.insert_one(rl)
