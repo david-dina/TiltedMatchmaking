@@ -56,6 +56,14 @@ async def on_command(ctx):
     await channel.send(f'`{ctx.command}` was used')
 
 @bot.event
+async def on_interaction(interaction:discord.Interaction):
+    channel = bot.get_channel(1002096611108851794)
+    if interaction.type == interaction.type.component:
+        return
+    else:
+        await channel.send(f'`{interaction.command.name}` was used')
+
+@bot.event
 async def on_guild_join(guild):
     embed = discord.Embed(
         title=f'Added to the guild: {guild.name}',
@@ -586,10 +594,6 @@ async def search(ctx: discord.Interaction, game: str):
                 user = bot.get_user(id)
                 mel = await UserProfiles.teammateyes(ctx, user)
                 if mel == False:
-                    embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                          description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                          color=0xCC071F)
-                    await user.send(embed=embed)
                     match.delete_one({"user": user.id})
                     info = {'game': 'RL', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
                             'region': f"{z.get('region')}", 'time': 0}
