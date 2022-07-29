@@ -97,49 +97,23 @@ async def on_guild_remove(guild):
 
 @bot.event
 async def on_member_join(members: discord.Member):
-    # if member.guild.id == 802368481840332820:
-    # find if just the key is matching
-    #        x = connected.find_one({}, {f'{member.id}':0,'_id':0})
-    #        if not x:
-    #            x = connected.find_one({}, {f'{member.id}':1,'_id':0})
-    #        z = list(x.keys())
-    #        a = list(x.values())
-    #        if x == None:
-    #            return
-    #        else:
-    #            y = bot.get_guild(802368481840332820)
-    #            for channel in y.channels:
-    #                if channel.name in z or channel.name in a or channel.name in str(member.id):
-    #                    try:
-    #                        try:
-    #                            await channel.set_permissions(member, read_messages=True, send_messages=True,view_channel = True)
-    #                        except Exception as e:
-    #                            perms = discord.PermissionOverwrite()
-    #                            perms.speak = True
-    #                            perms.connect = True
-    #                            perms.view_channel = True
-    #                            await channel.set_permissions(member, overwrite=perms)
-    #                    except Exception as ex:
-    #                        pass
-    #    user = bot.get_user(member.id)
-    #    if user.dm_channel:
-    #        return
-    #    else:
-    #        emoji = bot.get_emoji(838234937743245382)
-    #        embed = discord.Embed(title=f"{user.name},",
-    #                              description=f"It looks like **{member.guild}** is your first guild using {emoji} Tilted Matchmaking",
-    #                              color=0xCC071F)
-    #        embed.set_author(icon_url=bot.user.avatar.url,
-    #                        name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
-    #        embed.add_field(name='__As a server member you can claim these features__',
-    #                       value=" :art: Be able to create your own customizable profile :art:  \n :hammer: Add,Edit, and remove games from your gaming profile. :hammer: \n :people_holding_hands: Match with users discord-Wide to play your favorite games with a few clicks. :people_holding_hands:")
-    #        embed.set_footer(text="Tilted Matchmaking. Find The Teammate of Your Dreams.")
-    #        await user.send(embed=embed)
-
+    if members.guild.id == 1001879078569246790:
+        find = connected.find_one({'user': f'{members.id}'})
+        if find:
+            channel_ids = find.get('channel_id')
+            for id in channel_ids:
+                channel = bot.get_channel(id)
+                try:
+                    await channel.set_permissions(members, view_channel=True,read_messages=True,use_slash_commands=True)
+                except:
+                    await channel.set_permissions(members,view_channel=True,connect=True)
     DM_alr = False
     async for message in members.history(limit=1):
         DM_alr = True
     if DM_alr == False:
+        if members.bot:
+            DM_alr = True
+            return
         emoji = bot.get_emoji(838234937743245382)
         embed = discord.Embed(title=f"{members.name},",
                               description=f"It looks like **{members.guild}** is your first guild using {emoji} Tilted Matchmaking",
