@@ -5,6 +5,7 @@ from discord import Embed as Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
 import requests
+import json
 #chenpickle
 client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE",connect=False)
 db = client.games
@@ -23,6 +24,11 @@ dbv5 = client.server
 da_matches = dbv5.match
 
 client = pymongo.MongoClient('mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE',connect=False)
+db = client.server
+connected = db.matches
+#main
+client = pymongo.MongoClient(
+    'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
 db = client.server
 connected = db.matches
 
@@ -109,7 +115,7 @@ class Requesting:
         r = requests.get(url=self.URL)
         return r
 
-
+words = Requesting()
 class UserProfiles:
     def __init__(self,bot):
         self.bot = bot
@@ -174,14 +180,34 @@ class UserProfiles:
                                   color=0xCC071F)
             await ctx.user.send(embed=embed)
             guild = self.bot.get_guild(1001879078569246790)
-            category = [category for category in guild.categories if category.name =='Texts' or category.name == 'Voice']
+            ctx_guild_user = guild.get_member(ctx.user.id)
+            user_guild_user = guild.get_member(user.id)
+            word = words.get_word()
+            overwrites_txt = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            }
+            overwrites_vc = {
+                guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            }
+            if ctx_guild_user:
+                overwrites_txt[ctx_guild_user] = discord.PermissionOverwrite(read_messages=True)
+                overwrites_vc[ctx_guild_user] = discord.PermissionOverwrite(view_channel=True)
+            else:
+                connected.insert_one({f'{ctx.user.id}':word})
+
+            if user_guild_user:
+                overwrites_txt[user_guild_user] = discord.PermissionOverwrite(read_messages=True)
+                overwrites_vc[user_guild_user] = discord.PermissionOverwrite(view_channel=True)
+            else:
+                connected.insert_one({f'{user.id}': word})
+            category = [category for category in guild.categories if
+                        category.name == 'Texts' or category.name == 'Voice']
             for i in category:
-                if i.name=="Texts":await i.create_text_channel(name=f'{ctx.user.id}+{user.id}')
-                else:await i.create_voice_channel(name=f"{user.id}+{ctx.user.id}")
+                if i.name=="Texts":await i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
+                else:await i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
             channel = self.bot.get_channel(1001879079399739434)
             x = await channel.create_invite(reason='Successful Match Made.', max_age=3600, max_uses=5)
             #x = ctx.channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
-
             await user.send(f'{x}')
             await ctx.user.send(f'Here is your invite: {x}')
             await ctx.user.send(f'Remember to look out for {user.mention}')
