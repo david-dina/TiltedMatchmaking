@@ -5,7 +5,7 @@ from discord import Embed as Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
 import requests
-import json
+
 #chenpickle
 client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE",connect=False)
 db = client.games
@@ -22,10 +22,6 @@ val = db.valorant
 fort = db.fortnite
 dbv5 = client.server
 da_matches = dbv5.match
-
-client = pymongo.MongoClient('mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE',connect=False)
-db = client.server
-connected = db.matches
 #main
 client = pymongo.MongoClient(
     'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
@@ -109,11 +105,16 @@ class Requesting:
         self.URL = "https://random-word-api.herokuapp.com/word?lang=es&number=1"
 
     def get_word(self):
-        return self._send_request()
+        word = self._send_request()
+        word = word.replace('[', "")
+        word = word.replace(']', "")
+        word = word.replace('"', "")
+        word = word.replace(' ', '')
+        return word
 
-    def _send_request(self):
+    def _send_request(self) -> str:
         r = requests.get(url=self.URL)
-        return r
+        return r.content.decode()
 
 words = Requesting()
 class UserProfiles:
@@ -200,8 +201,8 @@ class UserProfiles:
             text_channel_id = None
             voice_channel_id = None
             for i in category:
-                if i.name=="Texts":text_channel_id = i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
-                else:voice_channel_id = i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
+                if i.name=="Texts":text_channel_id = await i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
+                else:voice_channel_id = await i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
             if not ctx_guild_user:
                 connected.insert_one({'user', ctx.user.id}, {'channel_name': word},{'channel_id':[str(text_channel_id),str(voice_channel_id)]})
             if not user_guild_user:
