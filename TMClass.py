@@ -192,19 +192,20 @@ class UserProfiles:
             if ctx_guild_user:
                 overwrites_txt[ctx_guild_user] = discord.PermissionOverwrite(read_messages=True)
                 overwrites_vc[ctx_guild_user] = discord.PermissionOverwrite(view_channel=True)
-            else:
-                connected.insert_one({f'{ctx.user.id}':word})
-
             if user_guild_user:
                 overwrites_txt[user_guild_user] = discord.PermissionOverwrite(read_messages=True)
                 overwrites_vc[user_guild_user] = discord.PermissionOverwrite(view_channel=True)
-            else:
-                connected.insert_one({f'{user.id}': word})
             category = [category for category in guild.categories if
                         category.name == 'Texts' or category.name == 'Voice']
+            text_channel_id = None
+            voice_channel_id = None
             for i in category:
-                if i.name=="Texts":await i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
-                else:await i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
+                if i.name=="Texts":text_channel_id = i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
+                else:voice_channel_id = i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
+            if not ctx_guild_user:
+                connected.insert_one({'user', ctx.user.id}, {'channel_name': word},{'channel_id':[str(text_channel_id),str(voice_channel_id)]})
+            if not user_guild_user:
+                connected.insert_one({'user', user.id}, {'channel_name': word},{'channel_id':[str(text_channel_id),str(voice_channel_id)]})
             channel = self.bot.get_channel(1001879079399739434)
             x = await channel.create_invite(reason='Successful Match Made.', max_age=3600, max_uses=5)
             #x = ctx.channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
