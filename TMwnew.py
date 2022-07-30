@@ -556,25 +556,21 @@ async def search(ctx: discord.Interaction, game: str):
                                           color=0xCC071F)
                     await ctx.followup.send(embed=embed)
                     info = {'game': 'RBX', 'region': f"{z.get('region')}"}
-                    y = match.find(info)
-                    if y:
-                        y = dict(y)
-                    for info in y:
-                        id = info.get('user')
-                        user = bot.get_user(id)
+                    count = match.count_documents(info)
+                    y = None
+                    if count == 0:
+                        y = None
+                    else:
+                        y = match.find(info)[0]
                     if not y:
                         info = {'user': ctx.user.id, 'game': "RBX", 'region': f"{z.get('region')}",
                                 'time': 0}
                         match.insert_one(info)
-                    if user == None:
-                        return
                     else:
+                        id = y.get('user')
+                        user = bot.get_user(id)
                         mel = await UserProfiles.teammateyes(ctx, user)
                         if mel == False:
-                            embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                                                  description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                                                  color=0xCC071F)
-                            await user.send(embed=embed)
                             match.delete_one({"user": user.id})
                             info = {'user': ctx.user.id, 'game': "RBX", 'region': f"{z.get('region')}",
                                     'time': 0}
@@ -641,19 +637,19 @@ async def search(ctx: discord.Interaction, game: str):
                     await ctx.followup.send(embed=embed)
                     x = val.find_one({'user': ctx.user.id})
                     info = {'game': 'Val', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                    y = match.find(info)
-                    if y:
-                        y = dict(y)
-                    for info in y:
-                        id = info.get('user')
-                        user = bot.get_user(id)
+                    count = match.count_documents(info)
+                    y = None
+                    if count == 0:
+                        y = None
+                    else:
+                        y = match.find(info)[0]
                     if not y:
                         info = {'game': 'Val', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
                                 'region': f"{z.get('region')}", 'time': 0}
                         match.insert_one(info)
-                    if user == None:
-                        return
                     else:
+                        id = info.get('user')
+                        user = bot.get_user(id)
                         mel = await UserProfiles.teammateyes(ctx, user)
                         if mel == False:
                             embed = discord.Embed(title='Alright. Removing you from the Queue.',
@@ -675,12 +671,12 @@ async def search(ctx: discord.Interaction, game: str):
                     await ctx.followup.send(embed=embed)
                     x = fort.find_one({'user': ctx.user.id})
                     info = {'game': 'Fort', 'rank': f"{x.get('rank')}", 'region': f"{z.get('region')}"}
-                    y = match.find(info)
-                    if y:
-                        y = dict(y)
-                    for info in y:
-                        id = info.get('user')
-                        user = bot.get_user(id)
+                    count = match.count_documents(info)
+                    y = None
+                    if count == 0:
+                        y = None
+                    else:
+                        y = match.find(info)[0]
                     if not y:
                         info = {'game': 'Fort', 'user': ctx.user.id, 'rank': f"{x.get('rank')}",
                                 'region': f"{z.get('region')}", 'time': 0}
@@ -688,6 +684,8 @@ async def search(ctx: discord.Interaction, game: str):
                     if user == None:
                         return
                     else:
+                        id = info.get('user')
+                        user = bot.get_user(id)
                         mel = await UserProfiles.teammateyes(ctx, user)
                         if mel == False:
                             embed = discord.Embed(title='Alright. Removing you from the Queue.',
