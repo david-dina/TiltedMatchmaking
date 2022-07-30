@@ -745,13 +745,13 @@ async def addgame(ctx: discord.Interaction,game: str):  # "Rocket League", "Robl
     await ctx.response.defer()
     x = Profiles.profiles(ctx.user.id)
     if x == None:
-        await ctx.followup.send('You dont have a profile to add games to. Please go set one up using `TM!setup`.')
+        await ctx.followup.send('You dont have a profile to add games to. Please go set one up using `/setup`.')
     else:
         if game == 'Rocket League':
             user = Profiles.rocket(ctx.user.id)
             if user != None:
                 await ctx.followup.send(
-                    'Error You already have this game on your profile. If you need to remove the game try the `TM!remove` command.')
+                    'Error You already have this game on your profile. If you need to remove the game try the `/remove` command.')
             else:
                 embed = discord.Embed(title='What is your Rocket League rank?', color=0xCC071F)
                 embed.add_field(name='you can either choose your 1\'s 2\'s or 3\'s', value='\u200b', inline=False)
