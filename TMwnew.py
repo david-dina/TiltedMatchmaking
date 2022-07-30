@@ -100,7 +100,7 @@ async def on_guild_join(guild:discord.Guild):
             try:
                 await members.send(embed=embed)
             except Exception as e:
-                log = bot.get_channel(1001878437906104391)
+                log = bot.get_channel(1002096611108851794)
                 await log.send('error: ' + str(e))
                 print(e)
 
@@ -156,8 +156,8 @@ async def on_member_join(members: discord.Member):
         try:
             await members.send(embed=embed)
         except Exception as e:
-            log = bot.get_channel(1001878437906104391)
-            await log.send(str(e))
+            log = bot.get_channel(1002096611108851794)
+            await log.send('error: '+str(e))
             print(e)
 
 
