@@ -75,7 +75,7 @@ async def on_guild_join(guild:discord.Guild):
     embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
     embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.banner_url}')
+    embed.set_thumbnail(url=f'{guild.banner}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
     ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
