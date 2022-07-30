@@ -5,9 +5,8 @@ from discord import Embed as Embed
 from discord.ext import commands,tasks
 from discord.ui import Button,View
 import requests
-
 #chenpickle
-client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE",connect=False)
+client = pymongo.MongoClient("mongodb+srv://starlord:Adeoluwa.05@playerinfo.t5g9l.mongodb.net/myFirstDatabase&retryWrites=true&w=majority")
 db = client.games
 RL = db.RocketLeague
 dbv2 = client.Match
@@ -20,13 +19,17 @@ rbx = db.Roblox
 MC = db.MC
 val = db.valorant
 fort = db.fortnite
-dbv5 = client.server
-da_matches = dbv5.match
-#main
-client = pymongo.MongoClient(
-    'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
+#dbv5 = client.server
+#da_matches = dbv5.match
+
+#client = pymongo.MongoClient('mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority?ssl=true&ssl_cert_reqs=CERT_NONE')
 db = client.server
-connected = db.matches
+connected = db.match
+#main
+#client = pymongo.MongoClient(
+    #'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
+#db = client.server
+#connected = db.matches
 
 class Profiles:
 
@@ -104,7 +107,7 @@ class Requesting:
     def __init__(self):
         self.URL = "https://random-word-api.herokuapp.com/word?lang=es&number=1"
 
-    def get_word(self):
+    def get_word(self) -> str:
         word = self._send_request()
         word = word.replace('[', "")
         word = word.replace(']', "")
@@ -204,9 +207,10 @@ class UserProfiles:
                 if i.name=="Texts":text_channel_id = await i.create_text_channel(name=f'{word}',overwrites=overwrites_txt)
                 else:voice_channel_id = await i.create_voice_channel(name=f"{word}",overwrites=overwrites_vc)
             if not ctx_guild_user:
-                connected.insert_one({'user', ctx.user.id}, {'channel_name': word},{'channel_id':[str(text_channel_id),str(voice_channel_id)]})
+                info = {'user':ctx.user.id,'channel_name': word,'channel_id_txt':str(text_channel_id.id),'channel_id_vc':str(voice_channel_id.id),"time":0}
+                connected.insert_one(info)
             if not user_guild_user:
-                connected.insert_one({'user', user.id}, {'channel_name': word},{'channel_id':[str(text_channel_id),str(voice_channel_id)]})
+                connected.insert_one({'user':user.id,'channel_name': word,'channel_id_txt':str(text_channel_id.id),'channel_id_vc':str(voice_channel_id.id),"time":0})
             channel = self.bot.get_channel(1001879079399739434)
             x = await channel.create_invite(reason='Successful Match Made.', max_age=3600, max_uses=5)
             #x = ctx.channel.create_invite(reason='Successful Match Made.', max_age=3600, max_usage=5)
