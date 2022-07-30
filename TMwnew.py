@@ -27,10 +27,10 @@ rbx = db.Roblox
 val = db.valorant
 fort = db.fortnite
 # main email
-client = pymongo.MongoClient(
-    'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
+#client = pymongo.MongoClient(
+    #'mongodb+srv://starlord:Adeoluwa.05@cluster0.52enc.mongodb.net/myFirstDatabase&retryWrites=true&w=majority')
 db = client.server
-connected = db.matches
+connected = db.match
 # minecraft later
 supported_games = []
 Roblox_game = app_commands.Choice(name='Roblox', value='Roblox')
@@ -76,7 +76,7 @@ async def on_guild_join(guild):
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
     embed.set_thumbnail(url=f'{guild.icon_url}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
-    ctx = bot.get_channel(822858833093066752)
+    ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
 
 
@@ -91,22 +91,25 @@ async def on_guild_remove(guild):
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
     embed.set_thumbnail(url=f'{guild.icon_url}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
-    ctx = bot.get_channel(822858833093066752)
+    ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
 
 
 @bot.event
 async def on_member_join(members: discord.Member):
     if members.guild.id == 1001879078569246790:
-        find = connected.find_one({'user': f'{members.id}'})
+        find = connected.find_one({'user': members.id})
         if find:
-            channel_ids = find.get('channel_id')
-            for id in channel_ids:
-                channel = bot.get_channel(id)
-                try:
-                    await channel.set_permissions(members, view_channel=True,read_messages=True,use_slash_commands=True)
-                except:
-                    await channel.set_permissions(members,view_channel=True,connect=True)
+            txt_channel_id = int(find.get('channel_id_txt'))
+            voice_channe_id = int(find.get('channel_id_vc'))
+            txt_channel = bot.get_channel(txt_channel_id)
+            voice_channel = bot.get_channel(voice_channe_id)
+            try:
+                await txt_channel.set_permissions(members, view_channel=True,read_messages=True)
+                await voice_channel.set_permissions(members,view_channel=True,connect=True)
+                connected.delete_one({'user':members.id})
+            except Exception as e:
+                print(e)
     DM_alr = False
     async for message in members.history(limit=1):
         DM_alr = True
@@ -154,37 +157,6 @@ async def on_command_error(ctx, error):
         await ctx.send('If this problem consists, please join our support and send a screenshot of your issue.')
 
 
-@bot.event
-async def on_guild_join(guild):
-    embed = discord.Embed(
-        title=f'Added to the guild: {guild.name}',
-        description=f'The bot is now in {len(bot.guilds)} guilds!',
-        color=discord.Color.green()
-    )
-    embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
-    embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
-    embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.icon_url}')
-    embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
-    embed.timestamp = datetime.datetime.utcnow()
-    ctx = bot.get_channel(822858833093066752)
-    await ctx.send(embed=embed)
-
-
-@bot.event
-async def on_guild_remove(guild):
-    embed = discord.Embed(
-        title=f'Removed from the guild: {guild.name}',
-        description=f'The bot is now in {len(bot.guilds)} guilds!',
-        color=discord.Color.red())
-    embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
-    embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
-    embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.icon_url}')
-    embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
-    embed.timestamp = datetime.datetime.utcnow()
-    ctx = bot.get_channel(822858833093066752)
-    await ctx.send(embed=embed)
 
 
 # Maintence commands
