@@ -59,13 +59,14 @@ async def on_command(ctx):
 @bot.event
 async def on_interaction(interaction:discord.Interaction):
     channel = bot.get_channel(1002096611108851794)
-    if interaction.type == interaction.type.component:
-        return
-    else:
+    try:
         await channel.send(f'`{interaction.command.name}` was used')
+    except:
+        pass
+
 
 @bot.event
-async def on_guild_join(guild):
+async def on_guild_join(guild:discord.Guild):
     embed = discord.Embed(
         title=f'Added to the guild: {guild.name}',
         description=f'The bot is now in {len(bot.guilds)} guilds!',
@@ -74,10 +75,35 @@ async def on_guild_join(guild):
     embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
     embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.icon_url}')
+    embed.set_thumbnail(url=f'{guild.banner_url}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
     ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
+    for members in guild.members:
+        DM_alr = False
+        async for message in members.history(limit=1):
+            DM_alr = True
+        if DM_alr == False:
+            if members.bot:
+                DM_alr = True
+                return
+            emoji = bot.get_emoji(838234937743245382)
+            embed = discord.Embed(title=f"{members.name},",
+                                  description=f"It looks like **{members.guild}** is your first guild using {emoji} Tilted Matchmaking",
+                                  color=0xCC071F)
+            embed.set_author(icon_url=bot.user.avatar.url,
+                             name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
+            embed.add_field(name='__As a server member you can claim these features__',
+                            value=" :art: Be able to create your own customizable profile :art:  \n :hammer: Add,Edit, and remove games from your gaming profile. :hammer: \n :people_holding_hands: Match with users discord-Wide to play your favorite games with a few clicks. :people_holding_hands:")
+            embed.set_footer(text="Start your profile today using /setup || Tilted Matchmaking, find the teammates of your dream.")
+
+            try:
+                await members.send(embed=embed)
+            except Exception as e:
+                log = bot.get_channel(1001878437906104391)
+                await log.send('error: ' + str(e))
+                print(e)
+
 
 
 @bot.event
@@ -198,16 +224,14 @@ region = ['North America', 'Europe', 'South America', 'Asia', 'Australia']
 async def setup(ctx: discord.Interaction, game: str):
     """Set up your personal profile using this command"""
     await ctx.response.defer()
-    # remember to remove below
-    channel = bot.get_channel(12345)
     x = Profiles.profiles(ctx.user.id)
-    # embed = discord.Embed(title=f'New Profile Setup by {ctx.user}',color=0xCC071F)
-    # if (ctx.message.guild == None):
-    # embed.add_field(name='Command ran in DMS',value='\u200b',inline=False)
-    # else:
-    # embed.add_field(name = f'Guild:',value=f'{ctx.guild}')
-    # channel = bot.get_channel(826331977257844746)
-    # await channel.send(embed = embed)
+    embed = discord.Embed(title=f'New Profile Setup by {ctx.user}',color=0xCC071F)
+    if (ctx.message.guild == None):
+        embed.add_field(name='Command ran in DMS',value='\u200b',inline=False)
+    else:
+        embed.add_field(name = f'Guild:',value=f'{ctx.guild}')
+    channel = bot.get_channel(1002096611108851794)
+    await channel.send(embed = embed)
     perp = Profiles.blacklisted(ctx.user.id)
     if perp != None:
         embed = discord.Embed(title=f'Error: You have been blacklisted from our services for: {perp.get("reason")} ',
