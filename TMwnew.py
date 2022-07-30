@@ -75,7 +75,7 @@ async def on_guild_join(guild:discord.Guild):
     embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
     embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.banner}')
+    embed.set_thumbnail(url=f'{guild.icon}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
     ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
@@ -115,7 +115,7 @@ async def on_guild_remove(guild):
     embed.add_field(name='**Owner**', value=f'{guild.owner.mention}|{guild.owner.id}', inline=False)
     embed.add_field(name='**Member Count**', value=f'{guild.member_count} members', inline=False)
     embed.add_field(name='**Boost Count**', value=f'{guild.premium_subscription_count} boosts', inline=False)
-    embed.set_thumbnail(url=f'{guild.icon_url}')
+    embed.set_thumbnail(url=f'{guild.icon}')
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
     ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
@@ -673,7 +673,7 @@ async def search(ctx: discord.Interaction, game: str):
                         match.insert_one(info)
                     else:
                         id = info.get('user')
-                        user = bot.get_user(id)
+                        user = bot.get_user(int(id))
                         mel = await UserProfiles.teammateyes(ctx, user)
                         if mel == False:
                             embed = discord.Embed(title='Alright. Removing you from the Queue.',
