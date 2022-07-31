@@ -517,13 +517,13 @@ async def setup_error(ctx, error):
         await ctx.followup.send('Your already running this command.')
 
 
-# @bot.command()
-# async def games(ctx):
-# """All of this bots supported games."""
-# embed = discord.Embed(title='All the currently supported games on our platform', color=0xCC071F)
-# embed.add_field(name='\u200b',value='Rocket League: RL \n Roblox \n Minecraft: MC\n Valorant: Val \n Fortnite')
-# embed.set_footer(text='If a game your play isnt on here and you want it to be added try the TM!suggest command')
-# await ctx.followup.send(embed = embed)
+@bot.tree.command()
+async def games(ctx):
+    """All of this bots supported games."""
+    embed = discord.Embed(title='All the currently supported games on our platform', color=0xCC071F)
+    embed.add_field(name='\u200b',value='Rocket League\n Roblox \n Valorant\n Fortnite')
+    embed.set_footer(text='If a game you play isnt on here and you want it to be added try the /suggest command')
+    await ctx.response.send_message(embed = embed)
 
 @bot.tree.command()
 @app_commands.choices(game=supported_games)
@@ -1217,33 +1217,34 @@ async def removegame(ctx: discord.Interaction, game: str):
         await ctx.followup.send(embed=embed, view=view)
 
 
-@bot.tree.command()
+
+class Feedback(discord.ui.Modal, title='Suggestion'):
+    def __init__(self,user):
+        super().__init__()
+        self.user = user
+
+    feedback = discord.ui.TextInput(
+        label='What do you want to suggest?',
+        style=discord.TextStyle.long,
+        placeholder='Type your suggestion here...',
+        required=True,
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f'Thanks for your suggestion, {self.user}!', ephemeral=True)
+        embed = discord.Embed(title=f'Suggestion from {self.user}', description=f'{self.feedback.value}', color=0xCC071F)
+        channel = bot.get_channel(1003400534406996028)
+        await channel.send(embed=embed)
+
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+
+
+@bot.tree.command(guild=discord.Object(877460893439512627))
 async def suggest(ctx: discord.Interaction):
     """Suggest features and or games for the bot"""
-    await ctx.response.defer()
-    embed = discord.Embed(title='Thanks for making a suggestion.',
-                          description='Whatever your next message is will be send as a suggestion. Please try to be a through as you can.',
-                          color=0xCC071F)
-    await ctx.followup.send(embed=embed)
-
-    def check(message):
-        return message.author == ctx.user and message.channel == ctx.message.channel
-
-    try:
-        x = await bot.wait_for('message', timeout=600, check=check)
-    except asyncio.TimeoutError:
-        embed = discord.Embed(title='You had 10 minutes to submit your suggestion.',
-                              description='If that isnt enought time just join our support server to submit your suggestion, which you can find [here](https://discord.gg/5XAubY2v3N)',
-                              color=0xCC071F)
-        await ctx.followup.send(embed=embed)
-    else:
-        embed = discord.Embed(title='Thank you for submitting a suggestion.',
-                              description='The devs will be sure to look at it, and maybe consider adding it as a feature',
-                              color=0xCC071F)
-        await ctx.followup.send(embed=embed)
-        embed = discord.Embed(title=f'Suggestion from {ctx.user}', description=f'{x.content}', color=0xCC071F)
-        channel = bot.get_channel(822858852143464558)
-        await channel.send(embed=embed)
+    await ctx.response.send_modal(Feedback(ctx.user.display_name))
 
 
 @bot.tree.command()
