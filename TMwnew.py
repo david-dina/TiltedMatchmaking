@@ -1443,7 +1443,7 @@ async def help(ctx):
     embed.add_field(name='Profile Commands', value='`/setup`\n`/profile`\n`/delprofile` \n`/addgame`\n`/removegame`',
                     inline=False)
     embed.add_field(name='Matchmaking Commands', value='`/search` \n`/cancel `', inline=False)
-    embed.add_field(name='Utilities', value='`/suggest`\n`/panel` \n`/report`\n`/games` \n`/invite`\n`/tutorial`',
+    embed.add_field(name='Utilities', value='`/suggest`\n`/report`\n`/games` \n`/invite`\n`/tutorial`\n`/vote`\n`/support`',
                     inline=False)
     embed.add_field(name='\u200b',
                     value='Need help with TM but dont want to join the support server? check out the tutorial video thats on youtube. You can find it [here](https://youtu.be/dOZHazMxcag)')
@@ -1464,22 +1464,22 @@ async def support(ctx:discord.Interaction):
     await ctx.response.send_message('https://discord.gg/rKWxkrCkUQ')
 
 
-@bot.tree.command(name='panel')
-@commands.has_permissions(manage_channels=True)
-async def panel(ctx: discord.Interaction, channel: discord.TextChannel = None):
-    """Member setup panel, A ease of use feature to help your server members gain a profile."""
-    await ctx.response.defer()
-    if channel == None:
-        channel = ctx.channel
-    await ctx.followup.send(f"Sending A setup panel to <#{channel.id}>")
-    embed = discord.Embed(title='Account Setup', description='React to this embed to setup your account.',
-                          color=0xCC071F)
-    embed.set_footer(text='If you react to this embed you will be sent a DM by the bot to set up your account.')
-    x = await channel.send(embed=embed)
-    emoji = bot.get_emoji(838234937743245382)
-    await x.add_reaction(emoji)
-    await asyncio.sleep(3)
-    await ctx.message.delete()
+#@bot.tree.command(name='panel')
+#@commands.has_permissions(manage_channels=True)
+#async def panel(ctx: discord.Interaction, channel: discord.TextChannel = None):
+    #"""Member setup panel, A ease of use feature to help your server members gain a profile."""
+    #await ctx.response.defer()
+    #if channel == None:
+        #channel = ctx.channel
+    #await ctx.followup.send(f"Sending A setup panel to <#{channel.id}>")
+    #embed = discord.Embed(title='Account Setup', description='React to this embed to setup your account.',
+                          #color=0xCC071F)
+    #embed.set_footer(text='If you react to this embed you will be sent a DM by the bot to set up your account.')
+    #x = await channel.send(embed=embed)
+    #emoji = bot.get_emoji(838234937743245382)
+    #await x.add_reaction(emoji)
+    #await asyncio.sleep(3)
+    #await ctx.message.delete()
 
 
 @bot.event
