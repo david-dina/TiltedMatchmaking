@@ -1219,9 +1219,11 @@ async def removegame(ctx: discord.Interaction, game: str):
 
 
 class Feedback(discord.ui.Modal, title='Suggestion'):
-    def __init__(self,user):
+    def __init__(self,user,discrim,id):
         super().__init__()
         self.user = user
+        self.discrim = discrim
+        self.id = id
 
     feedback = discord.ui.TextInput(
         label='What do you want to suggest?',
@@ -1232,7 +1234,7 @@ class Feedback(discord.ui.Modal, title='Suggestion'):
 
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.send_message(f'Thanks for your suggestion, {self.user}!', ephemeral=True)
-        embed = discord.Embed(title=f'Suggestion from {self.user}', description=f'{self.feedback.value}', color=0xCC071F)
+        embed = discord.Embed(title=f'Suggestion from {self.user}{self.discrim}||{self.id}', description=f'{self.feedback.value}', color=0xCC071F)
         channel = bot.get_channel(1003400534406996028)
         await channel.send(embed=embed)
 
@@ -1244,7 +1246,7 @@ class Feedback(discord.ui.Modal, title='Suggestion'):
 @bot.tree.command(guild=discord.Object(877460893439512627))
 async def suggest(ctx: discord.Interaction):
     """Suggest features and or games for the bot"""
-    await ctx.response.send_modal(Feedback(ctx.user.display_name))
+    await ctx.response.send_modal(Feedback(ctx.user.display_name,ctx.user.discriminator,ctx.user.id))
 
 
 @bot.tree.command()
