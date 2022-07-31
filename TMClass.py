@@ -76,15 +76,12 @@ class Profiles:
         val.delete_one({'user':user})
         fort.delete_one({'user':user})
 
-class MyView(discord.ui.View):
-    def __init__(self):
-        super().__init__()
-        self.answer = None
+class locationButtons(discord.ui.View):
     async def on_timeout(self) -> None:
         for item in self.children:
             item.disabled = True
         self.answer = 'No'
-        #await self.message.edit(view=self)
+        await self.message.edit(view=self)
 
 
     @discord.ui.button(label='Yes',style=discord.ButtonStyle.green)
@@ -94,14 +91,32 @@ class MyView(discord.ui.View):
         self.answer = 'Yes'
         self.stop()
 
-    @discord.ui.button(label='No', style=discord.ButtonStyle.danger)
-    async def no_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        embed = discord.Embed(title='Alright. Removing you from the Queue.',
-                              description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
-                              color=0xCC071F)
-        await interaction.response.send_message(embed=embed)
+class MyView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.answer = None
+
+    async def on_timeout(self) -> None:
+        for item in self.children:
+            item.disabled = True
         self.answer = 'No'
+        # await self.message.edit(view=self)
+
+    @discord.ui.button(label='Yes', style=discord.ButtonStyle.green)
+    async def yes_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message('Ok, getting you your invite!')
+        await self.on_timeout()
+        self.answer = 'Yes'
         self.stop()
+
+@discord.ui.button(label='No', style=discord.ButtonStyle.danger)
+async def no_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    embed = discord.Embed(title='Alright. Removing you from the Queue.',
+                          description='You can requeue anytime just make sure that you will be able to accept the invitation next time.',
+                          color=0xCC071F)
+    await interaction.response.send_message(embed=embed)
+    self.answer = 'No'
+    self.stop()
 
 class Requesting:
     def __init__(self):
@@ -125,21 +140,22 @@ class UserProfiles:
         self.bot = bot
 
     async def location(self,user:discord.User,channel: Greedy[int] = None) -> None:
+        known = None
         if channel == None:
             ctx = user
         else:
             ctx = self.bot.get_channel(channel)
-        async def button_callback(interaction: discord.Interaction):
+        async def button_callback(interaction: discord.Interaction,og_message=None):
             if interaction.user.id == user.id:
                 if interaction.data.get('custom_id') != 'Cancel':
                     region = interaction.data.get('custom_id')
                     Profile = {'user': user.id, 'region': f'{region}'}
                     if profiling.find_one(Profile):
-                        return
+                        profiling.delete_one(Profile)
                     profiling.insert_one(Profile)
-                    await interaction.delete_original_message()
+                    await known.delete()
                     embed = discord.Embed(title='Successfully set up your account',
-                                          description='If you want to find a partner right away then try my `TM!search` command.',
+                                          description='If you want to find a partner right away then try my `/search` command.',
                                           color=0xCC071F)
                     await interaction.response.send_message(embed=embed)
         button1 = Button(label="North America", style=discord.ButtonStyle.primary, custom_id='na')
@@ -159,14 +175,14 @@ class UserProfiles:
         view.add_item(button4)
         view.add_item(button5)
 
-        embed = discord.Embed(title='Where are you from?',
+        embed = Embed(title='Where are you from?',
                               description='We need this information in order to find people who are nearest to you. so you wont have to worry about latency.(for games that require it.)',
                               color=0xCC071F)
         embed.add_field(name='The supported locations are as followed.',
-                        value='North America: NA \n South America: SA \n Europe: EU \n Asia \n Australia')
+                        value='North America\n South America \n Europe\n Asia \n Australia')
         embed.set_footer(
-            text='If there is a location that is not currently supported that you would like Suggest it using TM!suggest.')
-        await ctx.send(embed=embed,view=view)
+            text='If there is a location that is not currently supported that you would like Suggest it using /suggest.')
+        known = await ctx.send(embed=embed,view=view)
 
 
 
