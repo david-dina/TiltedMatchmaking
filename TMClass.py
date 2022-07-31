@@ -253,7 +253,7 @@ class UserProfiles:
             await user.send('Thank you for using our services.')
             embed = Embed(title='A Match was successfully made', color=0xCC071F)
             embed.add_field(name='The users in question:', value=f'{ctx.user} and {user}', inline=False)
-            channel = self.bot.get_channel(1002096611108851794)
+            channel = self.bot.get_channel(1003400068780531752)
             await channel.send(embed=embed)
             return True
         else:
