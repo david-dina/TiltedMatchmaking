@@ -79,30 +79,35 @@ async def on_guild_join(guild:discord.Guild):
     embed.set_footer(text=f'{guild.id} | {len(bot.users)} users')
     ctx = bot.get_channel(1002096611108851794)
     await ctx.send(embed=embed)
-    for members in guild.members:
-        DM_alr = False
-        async for message in members.history(limit=1):
-            DM_alr = True
-        if DM_alr == False:
-            if members.bot:
+    try:
+        for members in guild.members:
+            DM_alr = False
+            async for message in members.history(limit=1):
                 DM_alr = True
-                return
-            emoji = bot.get_emoji(838234937743245382)
-            embed = discord.Embed(title=f"{members.name},",
-                                  description=f"It looks like **{members.guild}** is your first guild using {emoji} Tilted Matchmaking",
-                                  color=0xCC071F)
-            embed.set_author(icon_url=bot.user.avatar.url,
-                             name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
-            embed.add_field(name='__As a server member you can claim these features__',
-                            value=" :art: Be able to create your own customizable profile :art:  \n :hammer: Add,Edit, and remove games from your gaming profile. :hammer: \n :people_holding_hands: Match with users discord-Wide to play your favorite games with a few clicks. :people_holding_hands:")
-            embed.set_footer(text="Start your profile today using /setup || Tilted Matchmaking, find the teammates of your dream.")
+            if DM_alr == False:
+                if members.bot:
+                    DM_alr = True
+                    return
+                emoji = bot.get_emoji(838234937743245382)
+                embed = discord.Embed(title=f"{members.name},",
+                                      description=f"It looks like **{members.guild}** is your first guild using {emoji} Tilted Matchmaking",
+                                      color=0xCC071F)
+                embed.set_author(icon_url=bot.user.avatar.url,
+                                 name="Tilted Matchmaking notification", url='https://discord.gg/rKWxkrCkUQ')
+                embed.add_field(name='__As a server member you can claim these features__',
+                                value=" :art: Be able to create your own customizable profile :art:  \n :hammer: Add,Edit, and remove games from your gaming profile. :hammer: \n :people_holding_hands: Match with users discord-Wide to play your favorite games with a few clicks. :people_holding_hands:")
+                embed.set_footer(text="Start your profile today using /setup || Tilted Matchmaking, find the teammates of your dream.")
 
-            try:
-                await members.send(embed=embed)
-            except Exception as e:
-                log = bot.get_channel(1002096611108851794)
-                await log.send('error: ' + str(e))
-                print(e)
+                try:
+                    await members.send(embed=embed)
+                except Exception as e:
+                    log = bot.get_channel(1002096611108851794)
+                    await log.send('error: ' + str(e))
+                    print(e)
+    except Exception as e:
+        print(Exception)
+        log = bot.get_channel(1002096611108851794)
+        await log.send('error: ' + str(e))
 
 
 
