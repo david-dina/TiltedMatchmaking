@@ -229,16 +229,6 @@ async def setup(ctx: discord.Interaction, game: str):
     """Set up your personal profile using this command"""
     await ctx.response.defer()
     x = Profiles.profiles(ctx.user.id)
-    embed = discord.Embed(title=f'New Profile Setup by {ctx.user.name}|| {ctx.user.id}',color=0xCC071F)
-    if (ctx.guild == None):
-        embed.add_field(name='Command ran in DMS',value='\u200b',inline=False)
-    else:
-        embed.add_field(name = f'Guild:',value=f'{ctx.guild.name}')
-    channel = bot.get_channel(1003400068780531752)
-    try:
-        await channel.send(embed = embed)
-    except Exception as e:
-        print(e)
     perp = Profiles.blacklisted(ctx.user.id)
     if perp != None:
         embed = discord.Embed(title=f'Error: You have been blacklisted from our services for: {perp.get("reason")} ',
@@ -512,6 +502,16 @@ async def setup(ctx: discord.Interaction, game: str):
                 view.add_item(button3)
                 view.add_item(cancel)
                 await ctx.followup.send(embed=embed, view=view)
+            embed = discord.Embed(title=f'New Profile Setup by {ctx.user.name}|| {ctx.user.id}', color=0xCC071F)
+            if (ctx.guild == None):
+                embed.add_field(name='Command ran in DMS', value='\u200b', inline=False)
+            else:
+                embed.add_field(name=f'Guild:', value=f'{ctx.guild.name}')
+            channel = bot.get_channel(1003400068780531752)
+            try:
+                await channel.send(embed=embed)
+            except Exception as e:
+                print(e)
 
 
 @setup.error
