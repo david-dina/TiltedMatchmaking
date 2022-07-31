@@ -53,12 +53,12 @@ Reaction = Reaction(bot)
 
 @bot.event
 async def on_command(ctx):
-    channel = bot.get_channel(1002096611108851794)
+    channel = bot.get_channel(1003411305434206238)
     await channel.send(f'`{ctx.command}` was used')
 
 @bot.event
 async def on_interaction(interaction:discord.Interaction):
-    channel = bot.get_channel(1002096611108851794)
+    channel = bot.get_channel(1003411305434206238)
     try:
         await channel.send(f'`{interaction.command.name}` was used')
     except:
