@@ -155,9 +155,11 @@ async def on_member_join(members: discord.Member):
 
         try:
             await members.send(embed=embed)
+            log = bot.get_channel(1003394868212662272)
+            await log.send('success: message sent.')
         except Exception as e:
-            log = bot.get_channel(1002096611108851794)
-            await log.send('error: '+str(e))
+            log = bot.get_channel(1003394868212662272)
+            await log.send('error: '+ str(e))
             print(e)
 
 
@@ -179,8 +181,10 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.MissingPermissions):
         return
     else:
+        await ctx.send('An error occured. Please try using the bot again later')
         await ctx.send(error)
-        await ctx.send('If this problem consists, please join our support and send a screenshot of your issue.')
+        channel = bot.get_channel(1003395168629686282)
+        await channel.send(error)
 
 
 
